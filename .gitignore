@@ -1,0 +1,5 @@
+.DS_Store
+.in_use
+.trash/
+synced/
+node_modules/
