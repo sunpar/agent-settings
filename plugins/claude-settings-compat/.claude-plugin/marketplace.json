@@ -1,0 +1,13 @@
+{
+  "name": "claude-settings-compat",
+  "owner": {
+    "name": "Local compatibility packaging"
+  },
+  "plugins": [
+    {
+      "name": "anthropic-essentials",
+      "source": "./plugins/anthropic-essentials",
+      "description": "Anthropic feature development, CLAUDE.md management, and skill creation, packaged locally from official plugins."
+    }
+  ]
+}

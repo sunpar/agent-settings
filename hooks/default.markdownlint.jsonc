@@ -1,0 +1,8 @@
+// Fallback markdownlint config for repos without their own.
+// Line length and inline HTML are off because prose is rarely hard-wrapped.
+{
+  "default": true,
+  "MD013": false,
+  "MD033": false,
+  "MD041": false
+}

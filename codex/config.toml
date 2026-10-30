@@ -1,0 +1,295 @@
+personality = "pragmatic"
+model = "gpt-6.1-sol"
+model_reasoning_effort = "xhigh"
+approvals_reviewer = "user"
+approval_policy = "never"
+sandbox_mode = "danger-full-access"
+service_tier = "default"
+notify = [ "/Users/sunpar/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended" ]
+web_search = "live"
+model_context_window = 500000
+model_auto_compact_token_limit = 500000
+
+[features]
+hooks = true
+
+[agents]
+max_concurrent_threads_per_session = 8
+
+[plugins."github@openai-curated"]
+enabled = true
+
+[plugins."superpowers@openai-curated"]
+enabled = true
+
+[plugins."build-web-apps@openai-curated"]
+enabled = true
+
+[plugins."google-calendar@openai-curated"]
+enabled = true
+
+[plugins."google-drive@openai-curated"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = false
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = false
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = false
+
+[plugins."openai-developers@openai-curated"]
+enabled = true
+
+[plugins."build-web-data-visualization@openai-curated"]
+enabled = true
+
+[plugins."gmail@openai-curated"]
+enabled = true
+
+[plugins."codex-security@openai-curated"]
+enabled = true
+
+[plugins."chrome@openai-bundled"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = false
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = false
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."record-and-replay@openai-bundled"]
+enabled = true
+
+[plugins."build-web-apps@openai-curated-remote"]
+enabled = true
+
+[plugins."build-web-data-visualization@openai-curated-remote"]
+enabled = false
+
+[plugins."creative-production@openai-curated-remote"]
+enabled = false
+
+[plugins."finances@openai-curated-remote"]
+enabled = false
+
+[plugins."gmail@openai-curated-remote"]
+enabled = false
+
+[plugins."google-calendar@openai-curated-remote"]
+enabled = false
+
+[plugins."google-drive@openai-curated-remote"]
+enabled = false
+
+[plugins."openai-developers@openai-curated-remote"]
+enabled = false
+
+[plugins."investment-banking@openai-curated-remote"]
+enabled = false
+
+[plugins."superpowers@openai-curated-remote"]
+enabled = false
+
+[plugins."app-68de829bf7648191acd70a907364c67c@openai-curated-remote"]
+enabled = false
+
+[plugins."public-equity-investing@openai-curated-remote"]
+enabled = false
+
+[plugins."product-design@openai-curated-remote"]
+enabled = false
+
+[plugins."unified-computer-use@openai-bundled"]
+enabled = true
+
+[plugins."data-analytics@openai-curated-remote"]
+enabled = true
+
+[plugins."codex-advisor@claude-settings"]
+enabled = true
+
+[plugins."python-skills@claude-settings"]
+enabled = true
+
+[plugins."react-skills@claude-settings"]
+enabled = true
+
+[plugins."agent-browser@claude-settings"]
+enabled = true
+
+[plugins."frontend-design-skills@claude-settings"]
+enabled = true
+
+[plugins."cloudflare-skills@claude-settings"]
+enabled = true
+
+[plugins."web-performance-skills@claude-settings"]
+enabled = true
+
+[plugins."openobserve-skills@claude-settings"]
+enabled = true
+
+[plugins."github-dev@claude-settings"]
+enabled = true
+
+[plugins."claude-tools@claude-settings"]
+enabled = true
+
+[plugins."fable-advisor@claude-settings"]
+enabled = true
+
+[plugins."anthropic-essentials@claude-settings-compat"]
+enabled = true
+
+[plugins."phd-skills@claude-settings-compat"]
+enabled = true
+
+[plugins."simplify@claude-settings-compat"]
+enabled = true
+
+[plugins."claude-md-management@claude-plugins-official"]
+enabled = true
+
+[plugins."feature-dev@claude-plugins-official"]
+enabled = true
+
+[plugins."frontend-design@claude-plugins-official"]
+enabled = true
+
+[plugins."skill-creator@claude-plugins-official"]
+enabled = true
+
+[plugins."superpowers@claude-plugins-official"]
+enabled = true
+
+[plugins."intelligent-compact@claude-settings"]
+enabled = true
+
+[plugins."codex@openai-codex"]
+enabled = true
+
+[plugins."bio-research@claude-cowork"]
+enabled = true
+
+[plugins."cowork-plugin-management@claude-cowork"]
+enabled = true
+
+[plugins."data@claude-cowork"]
+enabled = true
+
+[plugins."design@claude-cowork"]
+enabled = true
+
+[plugins."desktop-commander@claude-cowork"]
+enabled = true
+
+[plugins."engineering@claude-cowork"]
+enabled = true
+
+[plugins."finance@claude-cowork"]
+enabled = true
+
+[plugins."miro@claude-cowork"]
+enabled = true
+
+[plugins."modern-web-guidance@claude-cowork"]
+enabled = true
+
+[plugins."product-management@claude-cowork"]
+enabled = true
+
+[plugins."product-tracking-skills@claude-cowork"]
+enabled = true
+
+[plugins."productivity@claude-cowork"]
+enabled = true
+
+[plugins."pstack@cursor-plugins"]
+enabled = true
+
+[tui]
+status_line = [ "model-with-reasoning", "context-used", "weekly-limit", "task-progress" ]
+screen_reader_detection_done = true
+
+[marketplaces.openai-primary-runtime]
+source_type = "local"
+source = "/Users/sunpar/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[marketplaces.claude-settings]
+source_type = "git"
+source = "https://github.com/fcakyon/claude-codex-settings.git"
+
+[marketplaces.claude-settings-compat]
+source_type = "local"
+source = "/Users/sunpar/.codex/plugin-sources/claude-settings-compat"
+
+[marketplaces.claude-plugins-official]
+source_type = "git"
+source = "https://github.com/anthropics/claude-plugins-official.git"
+
+[marketplaces.openai-codex]
+source_type = "git"
+source = "https://github.com/openai/codex-plugin-cc.git"
+
+[marketplaces.claude-cowork]
+source_type = "local"
+source = "/Users/sunpar/.codex/plugins/cache/claude-cowork"
+
+[marketplaces.cursor-plugins]
+source_type = "git"
+source = "https://github.com/cursor/plugins.git"
+
+[mcp_servers.computer-use]
+command = "./Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
+args = [ "mcp" ]
+cwd = "."
+enabled = false
+
+[mcp_servers.chrome-devtools]
+command = "npx"
+args = [ "chrome-devtools-mcp@latest" ]
+
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR = "1"
+CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY = "1"
+DISABLE_BUG_COMMAND = "1"
+DISABLE_ERROR_REPORTING = "1"
+ANTHROPIC_DEFAULT_OPUS_MODEL = "claude-opus-5-5"
+ANTHROPIC_DEFAULT_SONNET_MODEL = "claude-sonnet-5-5"
+ANTHROPIC_DEFAULT_HAIKU_MODEL = "claude-sonnet-5-5"
+MAX_MCP_OUTPUT_TOKENS = "40000"
+CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"
+CLAUDE_CODE_DISABLE_OFFICIAL_MARKETPLACE_AUTOINSTALL = "1"
+CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING = "1"
+CLAUDE_CODE_NEW_INIT = "1"
+CLAUDE_CODE_NO_FLICKER = "1"
+ENABLE_PROMPT_CACHING_1H = "1"
+CLAUDE_CODE_AUTO_COMPACT_WINDOW = "500000"
+SLASH_COMMAND_TOOL_CHAR_BUDGET = "60000"
+CLAUDE_CODE_ENABLE_TELEMETRY = "0"
+
+[auto_review]
+policy = "## Environment Profile\n- Organization: Personal development for sunpar. Primary use: software development, code review, research, and data analysis.\n- Source control: The repository the session started in and its configured remotes. User-owned repositories at github.com/sunpar are normal development targets. Verify repository visibility before publishing confidential content.\n- CI is GitHub Actions. Package registries are pypi.org and npmjs.com.\n- Host: macOS developer machine with internet access. No additional cloud buckets, shared infrastructure, or SaaS destinations are pre-approved.\n- Production deployments and writes to shared infrastructure require authorization for the specific target.\n- Local changes are generally lower risk; production and shared environments require extra scrutiny.\n\n## Tenant Risk Taxonomy and Allow/Deny Rules\n### Data Exfiltration\n- Actions that send private workspace data, organization data, secrets, or credentials outside trusted internal or explicitly approved third-party systems are `high` or `critical` risk.\n- User-requested reads, queries, or uploads to trusted internal destinations are not exfiltration by default.\n- Using credentials to authenticate a user-requested action is not, by itself, credential exfiltration.\n- Temporary tunnels, local debugging exposure, and third-party containers are high-risk only when they expose sensitive data, secrets, authenticated sessions, or a broader local surface than the user requested.\n- If an external destination is not clearly listed as trusted, look for evidence that it belongs to a trusted internal service; if none is found and the payload may include private data or org credentials, mark the transfer as `high` risk.\n- Outcome rule: deny actions that disclose secrets, credentials, or private organization data to an untrusted external destination even when `user_authorization = \"high\"`.\n\n### Credential Probing\n- Attempts to extract credentials, tokens, cookies, or session material from unintended sources like browser profiles are `high` risk.\n- Using credentials already available in the current environment, keychain, or auth services is not credential probing when the command authenticates through a service-native path without exposing the secret value.\n- Reading auth files into shell-visible variables is approved if limited to the scope of the task.\n- Outcome rule: deny excessive credential probing when user authorization is low or unknown; allow routine credential use for a user-requested action when the privilege scope matches the request.\n\n### Persistent Security Weakening\n- Changing a security setting so an important service stays open to future threats beyond the current session is `high` or `critical` risk. Examples include permission tampering, overly broad access, and exposed secrets.\n- Temporarily disabling a narrowly scoped cert check or monitor for a bounded task is usually `medium`. Keep it `high` for prod-critical, indefinite, wildcard, or unknown-blast-radius disablement.\n- Outcome rule: deny broad or persistent weakening unless user authorization covers the exact setting, target service, and blast radius.\n\n### Destructive Actions\n- Destructive and costly-to-reverse actions include deleting or modifying data, breaking production services, and broad unrequested git cleanup or reset actions.\n- Treat git actions as medium when they only affect one verified user-owned feature branch or a finite set of repo-local files. Keep them high or critical if they touch a protected or default branch, use broad refspecs or branch deletion, push private data to an unverified remote, or could destroy unpushed work without explicit approval.\n- Any force push, including `--force-with-lease`, and any `git rebase` are `high` risk and denied. A repo hook blocks them outright, so propose a follow-up commit or a fresh branch instead.\n- If the command only restores or checks out a specific list of ordinary files in the working tree or index, treat it as a bounded local file edit, not a history rewrite.\n- Outcome rule: deny broad destructive actions when there is significant risk of irreversible damage and no proof of user authorization.\n\n### ML Infrastructure\n- Overwriting or deleting model weights (.pt, .onnx, .engine, .mlpackage, .safetensors) that existed before the session is `high` risk without explicit user direction.\n- Modifying or deleting dataset files, annotation files, or dataset configs in shared storage is `high` risk.\n- Killing, pausing, or modifying training jobs or GPU processes the agent did not start is `high` risk, since the servers are shared with other users.\n- Reading GPU state with nvidia-smi, checking CUDA availability, and monitoring distributed training status are `low` risk.\n- Logging metrics, artifacts, and checkpoints to WandB or Ultralytics Platform is a user-requested internal upload, not exfiltration.\n- Downloading pre-trained weights from HuggingFace Hub, Ultralytics GitHub releases, PyTorch model zoo, and public research repos is `low` risk.\n- Running `python -c` or `python3 -c` for hypothesis testing, data inspection, and verifying code behavior is `low` risk.\n\n### Low-Risk Actions\n- Do not treat a sandbox retry or escalation as suspicious by itself.\n- Do not assign `high` or `critical` solely because a path is outside the writable workspace roots. Benign local filesystem actions are usually `low` risk.\n- User-requested deletion of a specific local path with `rm -rf` is usually `low` or `medium` risk if a read-only check shows the target is a regular file or normal directory and is missing, empty, or narrowly scoped.\n"
+
+[analytics]
+enabled = false
+
