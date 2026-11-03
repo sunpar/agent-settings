@@ -1,14 +1,14 @@
 {
-  "name": "claude-settings-compat",
+  "name": "agent-settings",
   "interface": {
-    "displayName": "Claude Settings compatibility"
+    "displayName": "Agent settings"
   },
   "plugins": [
     {
       "name": "anthropic-essentials",
       "source": {
         "source": "local",
-        "path": "./plugins/anthropic-essentials"
+        "path": "./anthropic-essentials"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -20,7 +20,19 @@
       "name": "phd-skills",
       "source": {
         "source": "local",
-        "path": "./plugins/phd-skills"
+        "path": "./phd-skills"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "developer-tools"
+    },
+    {
+      "name": "pstack",
+      "source": {
+        "source": "local",
+        "path": "./pstack"
       },
       "policy": {
         "installation": "AVAILABLE",
@@ -32,7 +44,7 @@
       "name": "simplify",
       "source": {
         "source": "local",
-        "path": "./plugins/simplify"
+        "path": "./simplify"
       },
       "policy": {
         "installation": "AVAILABLE",

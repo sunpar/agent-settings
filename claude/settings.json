@@ -136,47 +136,10 @@
     "defaultMode": "auto"
   },
   "model": "opus",
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash -c 'CMD=$(jq -r \".tool_input.command\"); S=$(printf \"%s\" \"$CMD\" | sed -e \"s/'\\''[^'\\'']*'\\''//g\" -e \"s/\\\"[^\\\"]*\\\"//g\"); if printf \"%s\" \"$S\" | grep -qE \"(^|[;&|(){}]|[[:space:]]do|[[:space:]]then|[[:space:]]else)[[:space:]]*timeout[[:space:]]\"; then printf \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PreToolUse\\\",\\\"permissionDecision\\\":\\\"deny\\\",\\\"permissionDecisionReason\\\":\\\"macOS has no timeout command on this host, so timeout N ... exits 127 with empty output and silently hides the real result (a remote ssh sweep can look idle when it is not). Use ssh -o ConnectTimeout=N, or gtimeout N (brew coreutils), or for a remote Linux host put timeout inside the ssh quotes.\\\"}}\"; fi'"
-          }
-        ]
-      },
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$HOME/.claude/hooks/edit_checks.py\" pre",
-            "timeout": 120,
-            "statusMessage": "Recording lint/type baseline"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$HOME/.claude/hooks/edit_checks.py\" post",
-            "timeout": 120,
-            "statusMessage": "Formatting, linting, type-checking"
-          }
-        ]
-      }
-    ]
-  },
   "enableWorkflows": true,
   "statusLine": {
     "type": "command",
-    "command": "bash \"/Users/sunpar/.claude/statusline.sh\"",
+    "command": "bash \"{{REPO}}/claude/statusline.sh\"",
     "padding": 0,
     "refreshInterval": 60
   },
@@ -201,7 +164,7 @@
     "claude-md-management@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": false,
     "fable-advisor@claude-settings": false,
-    "pstack@cursor-plugins": true
+    "pstack@agent-settings": true
   },
   "extraKnownMarketplaces": {
     "openai-codex": {
@@ -217,16 +180,10 @@
       },
       "autoUpdate": false
     },
-    "claude-settings-compat": {
+    "agent-settings": {
       "source": {
         "source": "directory",
-        "path": "/Users/sunpar/.codex/plugin-sources/claude-settings-compat"
-      }
-    },
-    "cursor-plugins": {
-      "source": {
-        "source": "github",
-        "repo": "cursor/plugins"
+        "path": "{{REPO}}/plugins"
       }
     }
   },

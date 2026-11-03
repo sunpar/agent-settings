@@ -5,7 +5,7 @@ approvals_reviewer = "user"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
 service_tier = "default"
-notify = [ "/Users/sunpar/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended" ]
+notify = [ "{{HOME}}/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended" ]
 web_search = "live"
 model_context_window = 500000
 model_auto_compact_token_limit = 500000
@@ -154,13 +154,13 @@ enabled = true
 [plugins."fable-advisor@claude-settings"]
 enabled = true
 
-[plugins."anthropic-essentials@claude-settings-compat"]
+[plugins."anthropic-essentials@agent-settings"]
 enabled = true
 
-[plugins."phd-skills@claude-settings-compat"]
+[plugins."phd-skills@agent-settings"]
 enabled = true
 
-[plugins."simplify@claude-settings-compat"]
+[plugins."simplify@agent-settings"]
 enabled = true
 
 [plugins."claude-md-management@claude-plugins-official"]
@@ -220,24 +220,15 @@ enabled = true
 [plugins."productivity@claude-cowork"]
 enabled = true
 
-[plugins."pstack@cursor-plugins"]
+[plugins."pstack@agent-settings"]
 enabled = true
 
 [tui]
 status_line = [ "model-with-reasoning", "context-used", "weekly-limit", "task-progress" ]
-screen_reader_detection_done = true
-
-[marketplaces.openai-primary-runtime]
-source_type = "local"
-source = "/Users/sunpar/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
 [marketplaces.claude-settings]
 source_type = "git"
 source = "https://github.com/fcakyon/claude-codex-settings.git"
-
-[marketplaces.claude-settings-compat]
-source_type = "local"
-source = "/Users/sunpar/.codex/plugin-sources/claude-settings-compat"
 
 [marketplaces.claude-plugins-official]
 source_type = "git"
@@ -247,13 +238,9 @@ source = "https://github.com/anthropics/claude-plugins-official.git"
 source_type = "git"
 source = "https://github.com/openai/codex-plugin-cc.git"
 
-[marketplaces.claude-cowork]
+[marketplaces.agent-settings]
 source_type = "local"
-source = "/Users/sunpar/.codex/plugins/cache/claude-cowork"
-
-[marketplaces.cursor-plugins]
-source_type = "git"
-source = "https://github.com/cursor/plugins.git"
+source = "{{REPO}}/plugins"
 
 [mcp_servers.computer-use]
 command = "./Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"

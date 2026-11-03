@@ -15,7 +15,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 '/Users/sunpar/.codex/hooks/edit_checks.py' pre",
+            "command": "python3 \"{{REPO}}/hooks/edit_checks.py\" pre",
             "timeout": 120,
             "statusMessage": "Recording lint/type baseline"
           }
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 '/Users/sunpar/.codex/hooks/edit_checks.py' post",
+            "command": "python3 \"{{REPO}}/hooks/edit_checks.py\" post",
             "timeout": 120,
             "statusMessage": "Formatting, linting, type-checking"
           }

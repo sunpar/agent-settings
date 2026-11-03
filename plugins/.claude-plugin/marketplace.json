@@ -1,0 +1,23 @@
+{
+  "name": "agent-settings",
+  "owner": {
+    "name": "Sundeep Paruchuri"
+  },
+  "plugins": [
+    {
+      "name": "phd-skills",
+      "source": "./phd-skills",
+      "description": "Catch AI mistakes before they cost weeks of compute. Reproduce papers from arxiv. Debug runs evidence-first. Compare experiments at the right epoch. Launch with discipline."
+    },
+    {
+      "name": "pstack",
+      "source": "./pstack",
+      "description": "if you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence."
+    },
+    {
+      "name": "simplify",
+      "source": "./simplify",
+      "description": "Review changed code for reuse, redundancy, and over-engineering, then apply fixes."
+    }
+  ]
+}

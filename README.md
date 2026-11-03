@@ -1,14 +1,26 @@
 # agent-settings
 
-Global settings, skills, and plugins for Claude Code, Codex, and OpenCode.
+Global instructions, skills, hooks, settings, and plugins for Claude Code and Codex, installed from one repo.
 
-- `AGENTS.md`: core global instructions (`CLAUDE.md` symlinks to it). Live at `~/.claude/CLAUDE.md`, linked from `~/.codex/AGENTS.md` and `~/.agents/AGENTS.md`.
+- `AGENTS.md`: global instructions for both tools (`CLAUDE.md` symlinks to it).
 - `skills/`: [tstack](https://github.com/t3dotgg/tstack) at `1085050` (MIT, see `skills/LICENSE-tstack`), plus `delegate`.
-- `plugins/pstack/`: [pstack](https://github.com/cursor/plugins/tree/main/pstack) 0.15.29 (MIT).
-- `plugins/claude-settings-compat/`: local marketplace used by both tools (see its `provenance.json`).
-- `hooks/`: edit-check hooks shared by Claude Code and Codex (`~/.claude/hooks`, `~/.codex/hooks`).
-- `claude/`: `~/.claude/settings.json` (plugins, marketplaces, permissions, hooks, env), `statusline.sh`, `rules/`, `references/`, `scripts/`.
-- `codex/`: `~/.codex/config.toml` (plugins, marketplaces, MCP servers), `hooks.json`, `rules/default.rules`. Machine state is stripped: project trust list, desktop/notice/hook-trust state, connector approvals, and the ChatGPT-app-managed `node_repl` MCP.
-- `opencode/`: `~/.config/opencode/opencode.json`.
+- `plugins/`: the `agent-settings` local marketplace for both tools. Holds [pstack](https://github.com/cursor/plugins/tree/main/pstack) 0.15.29 (MIT) and the plugins listed in `plugins/PROVENANCE.json`.
+- `hooks/`: edit-check hooks shared by both tools.
+- `claude/`: Claude Code settings, statusline, and rules.
+- `codex/`: Codex `config.toml` and approved command rules.
+- `opencode/`: OpenCode config. Not installed.
 
-Claude Code has no user-scope MCP servers; its MCPs come from plugins and claude.ai connectors.
+## Install
+
+```sh
+git pull && ./install
+```
+
+`./install` needs [uv](https://docs.astral.sh/uv/). It prints each change, then links, renders, and merges the files into `~/.claude`, `~/.codex`, and `~/.agents`. Settings and config files are merged, so keys that Claude Code and Codex write themselves (permission approvals, project trust, hook trust) are kept. Run it again any time. When nothing changed it prints `up to date`.
+
+- `./install --dry-run` prints the plan and writes nothing.
+- `./install claude` or `./install codex` installs one tool only.
+- Every file it replaces or removes is copied first to `~/.local/state/agent-settings/backups/<UTC timestamp>/`.
+- After the first run, and whenever `hooks/hooks.json` changes, Codex asks you to trust the hooks again.
+
+To update pstack, copy upstream `harness/pstack/claude-code` over `plugins/pstack/` and bump the version in `plugins/pstack/plugin.json` and `plugins/pstack/.claude-plugin/plugin.json`.
