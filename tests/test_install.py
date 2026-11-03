@@ -172,12 +172,10 @@ def test_originals_backed_up_and_replaced(home: Path) -> None:
     run(home)
     [backup] = (home / BACKUPS).iterdir()
     assert (backup / ".claude/skills/full-send/SKILL.md").read_text() == "stale copy\n"
-    assert (backup / ".claude/hooks/edit_checks.py").read_text() == "old hook\n"
     assert (
         json.loads((backup / ".claude/settings.json").read_text())["theme"] == "light"
     )
     assert (backup / ".codex/config.toml").read_text().startswith("# my comment")
-    assert not (home / ".claude/hooks/edit_checks.py").exists()
 
 
 def test_unrelated_hook_scripts_survive(home: Path) -> None:

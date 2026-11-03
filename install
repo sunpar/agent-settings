@@ -98,8 +98,6 @@ REGISTRY: dict[Harness, tuple[Op, ...]] = {
             ),
         ),
         Remove(".claude/statusline.sh"),
-        Remove(".claude/hooks/edit_checks.py"),
-        Remove(".claude/hooks/default.markdownlint.jsonc"),
     ),
     "codex": (
         Link("AGENTS.md", ".codex/AGENTS.md"),
@@ -117,8 +115,6 @@ REGISTRY: dict[Harness, tuple[Op, ...]] = {
             ),
         ),
         EnsureLines("codex/rules/default.rules", ".codex/rules/default.rules"),
-        Remove(".codex/hooks/edit_checks.py"),
-        Remove(".codex/hooks/default.markdownlint.jsonc"),
     ),
 }
 
