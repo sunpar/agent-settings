@@ -177,7 +177,13 @@ def test_originals_backed_up_and_replaced(home: Path) -> None:
         json.loads((backup / ".claude/settings.json").read_text())["theme"] == "light"
     )
     assert (backup / ".codex/config.toml").read_text().startswith("# my comment")
-    assert not (home / ".claude/hooks").exists()
+    assert not (home / ".claude/hooks/edit_checks.py").exists()
+
+
+def test_unrelated_hook_scripts_survive(home: Path) -> None:
+    write(home / ".claude/hooks/my_stop.py", "mine\n")
+    run(home)
+    assert (home / ".claude/hooks/my_stop.py").read_text() == "mine\n"
 
 
 def test_second_run_is_up_to_date(home: Path) -> None:

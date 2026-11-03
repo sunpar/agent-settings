@@ -98,7 +98,8 @@ REGISTRY: dict[Harness, tuple[Op, ...]] = {
             ),
         ),
         Remove(".claude/statusline.sh"),
-        Remove(".claude/hooks"),
+        Remove(".claude/hooks/edit_checks.py"),
+        Remove(".claude/hooks/default.markdownlint.jsonc"),
     ),
     "codex": (
         Link("AGENTS.md", ".codex/AGENTS.md"),
@@ -116,7 +117,8 @@ REGISTRY: dict[Harness, tuple[Op, ...]] = {
             ),
         ),
         EnsureLines("codex/rules/default.rules", ".codex/rules/default.rules"),
-        Remove(".codex/hooks"),
+        Remove(".codex/hooks/edit_checks.py"),
+        Remove(".codex/hooks/default.markdownlint.jsonc"),
     ),
 }
 
@@ -204,6 +206,8 @@ def plan_op(op: Op) -> list[Change]:
         case Link(src):
             return plan_link(REPO / src, dest)
         case LinkEach(src):
+            if dest.resolve() == (REPO / src).resolve():
+                return []
             return [change for child in sorted((REPO / src).iterdir()) if child.is_dir() for change in plan_link(child, dest / child.name)]
         case Render(src):
             text = render(src)
