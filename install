@@ -1,0 +1,298 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.12"
+# dependencies = ["tomlkit"]
+# ///
+"""Install this repo's agent settings into Claude Code and Codex.
+
+Usage: ./install [claude|codex ...] [--dry-run]
+"""
+
+import argparse
+import json
+import os
+import shutil
+from collections.abc import Callable
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any, Literal
+
+import tomlkit
+
+HOME = Path.home()
+REPO = Path(__file__).resolve().parent
+
+type Harness = Literal["claude", "codex"]
+type KeyPath = tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class Link:
+    """Symlink HOME/dest to REPO/src."""
+
+    src: str
+    dest: str
+
+
+@dataclass(frozen=True)
+class LinkEach:
+    """Symlink each directory in REPO/src into the real directory HOME/dest, leaving other children alone."""
+
+    src: str
+    dest: str
+
+
+@dataclass(frozen=True)
+class Render:
+    """Write REPO/src to HOME/dest as a real file with {{HOME}} and {{REPO}} filled in."""
+
+    src: str
+    dest: str
+
+
+@dataclass(frozen=True)
+class Merge:
+    """Deep-merge rendered REPO/srcs into the live HOME/dest, keeping keys only the live file has.
+
+    Repo keys win. Lists are replaced, except at `union` paths, where missing repo items are
+    appended to the live list. Keys at `retire` paths are deleted.
+    """
+
+    srcs: tuple[str, ...]
+    dest: str
+    union: frozenset[KeyPath] = frozenset()
+    retire: tuple[KeyPath, ...] = ()
+
+
+@dataclass(frozen=True)
+class EnsureLines:
+    """Append lines of REPO/src missing from HOME/dest, never removing any."""
+
+    src: str
+    dest: str
+
+
+@dataclass(frozen=True)
+class Remove:
+    """Delete HOME/dest if it exists."""
+
+    dest: str
+
+
+type Op = Link | LinkEach | Render | Merge | EnsureLines | Remove
+
+REGISTRY: dict[Harness, tuple[Op, ...]] = {
+    "claude": (
+        Link("AGENTS.md", ".claude/CLAUDE.md"),
+        LinkEach("skills", ".claude/skills"),
+        Link("claude/rules/pstack-models.md", ".claude/rules/pstack-models.md"),
+        Merge(
+            ("claude/settings.json", "hooks/hooks.json"),
+            ".claude/settings.json",
+            union=frozenset({("permissions", "allow")}),
+            retire=(
+                ("extraKnownMarketplaces", "claude-settings-compat"),
+                ("extraKnownMarketplaces", "cursor-plugins"),
+                ("enabledPlugins", "pstack@cursor-plugins"),
+            ),
+        ),
+        Remove(".claude/statusline.sh"),
+        Remove(".claude/hooks"),
+    ),
+    "codex": (
+        Link("AGENTS.md", ".codex/AGENTS.md"),
+        Link("AGENTS.md", ".agents/AGENTS.md"),
+        LinkEach("skills", ".codex/skills"),
+        Render("hooks/hooks.json", ".codex/hooks.json"),
+        Merge(
+            ("codex/config.toml",),
+            ".codex/config.toml",
+            retire=(
+                ("marketplaces", "claude-settings-compat"),
+                ("marketplaces", "cursor-plugins"),
+                ("plugins", "pstack@cursor-plugins"),
+                *(("plugins", f"{name}@claude-settings-compat") for name in ("anthropic-essentials", "phd-skills", "simplify")),
+            ),
+        ),
+        EnsureLines("codex/rules/default.rules", ".codex/rules/default.rules"),
+        Remove(".codex/hooks"),
+        Remove(".codex/plugin-sources/claude-settings-compat"),
+    ),
+}
+
+
+@dataclass(frozen=True)
+class Change:
+    """One destination to rewrite: a symlink target (Path), file text (str), or removal (None)."""
+
+    dest: Path
+    after: Path | str | None
+    lines: tuple[str, ...]
+
+
+FORMATS: dict[str, tuple[Callable[[str], Any], Callable[[Any], str]]] = {
+    ".json": (json.loads, lambda data: json.dumps(data, indent=2) + "\n"),
+    ".toml": (tomlkit.parse, tomlkit.dumps),
+}
+
+
+def tilde(path: Path) -> str:
+    return f"~/{path.relative_to(HOME)}"
+
+
+def render(src: str) -> str:
+    return (REPO / src).read_text().replace("{{HOME}}", str(HOME)).replace("{{REPO}}", str(REPO))
+
+
+def unwrap(value: Any) -> Any:
+    return value.unwrap() if hasattr(value, "unwrap") else value
+
+
+def show(value: Any) -> str:
+    text = json.dumps(unwrap(value), ensure_ascii=False)
+    return text if len(text) <= 80 else f"{text[:77]}..."
+
+
+def merge(live: dict, repo: dict, union: frozenset[KeyPath], path: KeyPath = ()) -> list[str]:
+    """Merge repo into live in place and describe each repo-owned value that changed.
+
+    Args:
+        live (dict): Parsed live document, mutated in place.
+        repo (dict): Parsed rendered repo document.
+        union (frozenset[KeyPath]): Key paths whose lists keep live items and append missing repo items.
+        path (KeyPath): Key path of `live` within the document.
+
+    Returns:
+        (list[str]): One "key.path: old -> new" description per changed value.
+    """
+    drift = []
+    for key, value in repo.items():
+        keys = (*path, key)
+        dotted = ".".join(keys)
+        old = live.get(key)
+        if isinstance(value, dict) and isinstance(old, dict):
+            drift += merge(old, value, union, keys)
+        elif keys in union and isinstance(old, list):
+            missing = [item for item in value if item not in old]
+            old.extend(missing)
+            drift += [f"{dotted}: + {show(item)}" for item in missing]
+        elif unwrap(old) != unwrap(value):
+            drift.append(f"{dotted}: {show(old)} -> {show(value)}" if key in live else f"{dotted}: {show(value)}")
+            live[key] = value
+    return drift
+
+
+def retire(live: dict, path: KeyPath) -> bool:
+    *parents, key = path
+    for parent in parents:
+        live = live.get(parent)
+        if not isinstance(live, dict):
+            return False
+    return live.pop(key, None) is not None
+
+
+def plan_link(target: Path, dest: Path) -> list[Change]:
+    if dest.is_symlink() and os.readlink(dest) == str(target):
+        return []
+    sigil = "~" if dest.is_symlink() or dest.exists() else "+"
+    return [Change(dest, target, (f"{sigil} {tilde(dest)} -> {target.relative_to(REPO)}",))]
+
+
+def plan_op(op: Op) -> list[Change]:
+    dest = HOME / op.dest
+    match op:
+        case Link(src):
+            return plan_link(REPO / src, dest)
+        case LinkEach(src):
+            return [change for child in sorted((REPO / src).iterdir()) if child.is_dir() for change in plan_link(child, dest / child.name)]
+        case Render(src):
+            text = render(src)
+            if not dest.is_symlink() and dest.is_file() and dest.read_text() == text:
+                return []
+            return [Change(dest, text, (f"{'~' if dest.exists() else '+'} {tilde(dest)}",))]
+        case Merge(srcs, _, union, retired):
+            load, dump = FORMATS[dest.suffix]
+            if not dest.exists():
+                data = load(render(srcs[0]))
+                for src in srcs[1:]:
+                    merge(data, load(render(src)), union)
+                return [Change(dest, dump(data), (f"+ {tilde(dest)}",))]
+            data = load(dest.read_text())
+            drift = [line for src in srcs for line in merge(data, load(render(src)), union)]
+            drift += [f"{'.'.join(path)}: removed" for path in retired if retire(data, path)]
+            return [Change(dest, dump(data), tuple(f"~ {tilde(dest)} {line}" for line in drift))] if drift else []
+        case EnsureLines(src):
+            live = dest.read_text() if dest.exists() else ""
+            missing = [line for line in (REPO / src).read_text().splitlines() if line not in live.splitlines()]
+            if not missing:
+                return []
+            text = live + ("\n" if live and not live.endswith("\n") else "") + "".join(f"{line}\n" for line in missing)
+            return [Change(dest, text, tuple(f"+ {tilde(dest)}: {line}" for line in missing))]
+        case Remove():
+            return [Change(dest, None, (f"- {tilde(dest)}",))] if dest.is_symlink() or dest.exists() else []
+
+
+def plan(ops: tuple[Op, ...]) -> list[Change]:
+    return [change for op in ops for change in plan_op(op)]
+
+
+def backup(path: Path, backup_root: Path) -> None:
+    copy = backup_root / path.relative_to(HOME)
+    copy.parent.mkdir(parents=True, exist_ok=True)
+    if path.is_dir() and not path.is_symlink():
+        shutil.copytree(path, copy, symlinks=True)
+    else:
+        shutil.copy2(path, copy, follow_symlinks=False)
+
+
+def write(change: Change) -> None:
+    dest = change.dest
+    if dest.is_dir() and not dest.is_symlink():
+        shutil.rmtree(dest)
+    if change.after is None:
+        dest.unlink(missing_ok=True)
+        return
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    tmp = dest.with_name(f".{dest.name}.agent-settings-tmp")
+    tmp.unlink(missing_ok=True)
+    if isinstance(change.after, Path):
+        tmp.symlink_to(change.after)
+    else:
+        tmp.write_text(change.after)
+        # Keep the original mode: harness config files can hold tokens and be private.
+        if dest.is_file():
+            shutil.copymode(dest, tmp)
+    os.replace(tmp, dest)
+
+
+def apply(changes: list[Change], backup_root: Path) -> None:
+    """Back up every existing destination, then write all changes."""
+    for change in changes:
+        if change.dest.is_symlink() or change.dest.exists():
+            backup(change.dest, backup_root)
+    for change in changes:
+        write(change)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Install agent settings into Claude Code and Codex.")
+    parser.add_argument("harness", nargs="*", choices=list(REGISTRY), help="harnesses to install (default: all)")
+    parser.add_argument("--dry-run", action="store_true", help="print the plan without writing anything")
+    args = parser.parse_args()
+    changes = plan(tuple(op for harness in args.harness or REGISTRY for op in REGISTRY[harness]))
+    if not changes:
+        print("up to date")
+        return
+    for change in changes:
+        print("\n".join(change.lines))
+    if args.dry_run:
+        return
+    backup_root = HOME / ".local/state/agent-settings/backups" / datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    apply(changes, backup_root)
+    if backup_root.exists():
+        print(f"backups in {tilde(backup_root)}")
+
+
+if __name__ == "__main__":
+    main()
