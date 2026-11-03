@@ -5,11 +5,6 @@
   },
   "plugins": [
     {
-      "name": "anthropic-essentials",
-      "source": "./anthropic-essentials",
-      "description": "Anthropic feature development, CLAUDE.md management, and skill creation, packaged locally from official plugins."
-    },
-    {
       "name": "phd-skills",
       "source": "./phd-skills",
       "description": "Catch AI mistakes before they cost weeks of compute. Reproduce papers from arxiv. Debug runs evidence-first. Compare experiments at the right epoch. Launch with discipline."
