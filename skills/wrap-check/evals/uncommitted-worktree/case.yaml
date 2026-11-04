@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: uncommitted-worktree
+expected_outcome: |
+  The feature works but one commit is unpushed and two files are uncommitted in the session's
+  worktree. The response says it is NOT safe to archive because archiving deletes the worktree,
+  offers to commit and push here, proposes the Retry-After bug as a separate new-session card
+  with a self-contained brief, and does not archive.
+context:
+  scaffold_script: place-files.sh
