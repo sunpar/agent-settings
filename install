@@ -95,6 +95,20 @@ REGISTRY: dict[Harness, tuple[Op, ...]] = {
                 ("extraKnownMarketplaces", "claude-settings-compat"),
                 ("extraKnownMarketplaces", "cursor-plugins"),
                 ("enabledPlugins", "pstack@cursor-plugins"),
+                ("outputStyle",),
+                ("spinnerTipsEnabled",),
+                ("switchModelsOnFlag",),
+                *(
+                    ("env", name)
+                    for name in (
+                        "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR",
+                        "CLAUDE_CODE_DISABLE_OFFICIAL_MARKETPLACE_AUTOINSTALL",
+                        "CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING",
+                        "CLAUDE_CODE_NO_FLICKER",
+                        "ENABLE_PROMPT_CACHING_1H",
+                        "SLASH_COMMAND_TOOL_CHAR_BUDGET",
+                    )
+                ),
             ),
         ),
         Remove(".claude/statusline.sh"),
