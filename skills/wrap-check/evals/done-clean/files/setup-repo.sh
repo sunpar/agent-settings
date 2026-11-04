@@ -8,6 +8,8 @@ git config user.email t@example.com; git config user.name Test
 mkdir -p utils tests
 printf 'def parse_date(s):\n    return s\n' > utils/dates.py
 printf 'def test_x():\n    pass\n' > tests/test_dates.py
+# a root conftest.py puts the repo root on sys.path so tests can import utils
+touch conftest.py
 git add -A; git commit -qm "Initial"
 git remote add origin ../remote.git; git push -qu origin main
 git switch -qc fix-iso-z
