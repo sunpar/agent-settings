@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: done-clean
+expected_outcome: |
+  Everything in the session is finished: fix committed, pushed, PR merged, nothing running.
+  The response says the session is safe to archive, cites the evidence, and offers an
+  archive button through wrap_up. It does not archive without a yes and proposes no sessions.
+context:
+  scaffold_script: place-files.sh

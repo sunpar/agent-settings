@@ -1,0 +1,10 @@
+schema_version: "1.1"
+name: waiting-and-parallel
+expected_outcome: |
+  PR is open with CI pending and needs a reviewer's approval, the CHANGELOG entry the user asked
+  for was never written, an e2e run and a side session are still working, and a legacy_fetch
+  migration was promised as a separate PR. The response says it is not done, lists the CHANGELOG as
+  work to do here, flags the approval as waiting on the user, says the running work blocks archiving,
+  proposes the legacy_fetch migration as a new-session card, and does not archive.
+context:
+  scaffold_script: place-files.sh
