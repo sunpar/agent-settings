@@ -35,10 +35,19 @@ last turn.
   assistant asked that the user never answered.
 - Session cards proposed but never started or dismissed.
 
+**Claims.** The transcript is the session's own account of its work, and it
+can be wrong. Before counting a request as done, check each concrete claim
+against the repo: files "added" or "changed" appear in the commits
+(`git show --stat`), "committed" is in `git log`, "pushed" matches the
+upstream, a named test exists. Rerun a test the transcript says passed only
+when it's quick and named. A claim the repo contradicts is work left; one you
+can't check is "unverified", not done.
+
 **Repo.** Run in the target's folder, read-only:
 
 - `git status --short`, `git stash list`
-- `git log @{u}..` for unpushed commits (no upstream means nothing is pushed)
+- `git log @{u}..` for unpushed commits. No upstream means nothing is
+  pushed, unless the PR merged and the branch was deleted afterward.
 - `git worktree list` and `get_session` to see whether the session owns a
   worktree. Archiving deletes that worktree by default, so uncommitted or
   unpushed work there is lost on archive. Treat it as a blocker, not a nit.

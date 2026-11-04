@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: claim-not-in-repo
+expected_outcome: |
+  The transcript says a test was added and the PR merged, and the PR did merge, but the commit
+  never touched tests/ and test_parse_date_zulu does not exist. The response says the session is
+  not done because the claimed test is missing, cites the repo evidence, offers to add the test,
+  and does not archive.
+context:
+  scaffold_script: place-files.sh
