@@ -53,9 +53,9 @@
   "sandbox": {
     "enabled": true,
     "excludedCommands": [
-      "docker",
-      "gh",
-      "git"
+      "docker *",
+      "gh *",
+      "git *"
     ],
     "allowAppleEvents": true,
     "network": {
