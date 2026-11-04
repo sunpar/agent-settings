@@ -98,6 +98,7 @@ REGISTRY: dict[Harness, tuple[Op, ...]] = {
                 ("outputStyle",),
                 ("spinnerTipsEnabled",),
                 ("switchModelsOnFlag",),
+                ("sandbox",),
                 *(
                     ("env", name)
                     for name in (
