@@ -108,7 +108,7 @@ def test_claude_settings_merge(home: Path) -> None:
     assert settings["feedbackSurveyState"] == {"lastShownTime": 1}
     assert settings["theme"] == "dark"
     assert settings["permissions"]["allow"][:2] == ["Bash(ls:*)", "Bash(my-own-tool:*)"]
-    assert "Bash(rg:*)" in settings["permissions"]["allow"]
+    assert settings["permissions"]["ask"] == ["Bash(rm -rf:*)"]
     assert settings["enabledPlugins"]["mine@elsewhere"] is True
     assert settings["enabledPlugins"]["pstack@agent-settings"] is True
     assert "pstack@cursor-plugins" not in settings["enabledPlugins"]
