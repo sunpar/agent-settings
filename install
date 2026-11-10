@@ -99,6 +99,7 @@ REGISTRY: dict[Harness, tuple[Op, ...]] = {
                 ("spinnerTipsEnabled",),
                 ("switchModelsOnFlag",),
                 ("sandbox",),
+                ("permissions", "ask"),
                 *(
                     ("env", name)
                     for name in (
