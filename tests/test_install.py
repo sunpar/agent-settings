@@ -46,7 +46,10 @@ def home(tmp_path: Path) -> Path:
             {
                 "theme": "light",
                 "feedbackSurveyState": {"lastShownTime": 1},
-                "permissions": {"allow": ["Bash(ls:*)", "Bash(my-own-tool:*)"]},
+                "permissions": {
+                    "allow": ["Bash(ls:*)", "Bash(my-own-tool:*)"],
+                    "ask": ["Bash(rm -rf:*)"],
+                },
                 "hooks": {
                     "PreToolUse": [
                         {
@@ -108,7 +111,7 @@ def test_claude_settings_merge(home: Path) -> None:
     assert settings["feedbackSurveyState"] == {"lastShownTime": 1}
     assert settings["theme"] == "dark"
     assert settings["permissions"]["allow"][:2] == ["Bash(ls:*)", "Bash(my-own-tool:*)"]
-    assert settings["permissions"]["ask"] == ["Bash(rm -rf:*)"]
+    assert "ask" not in settings["permissions"]
     assert settings["enabledPlugins"]["mine@elsewhere"] is True
     assert settings["enabledPlugins"]["pstack@agent-settings"] is True
     assert "pstack@cursor-plugins" not in settings["enabledPlugins"]
