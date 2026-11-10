@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "model": "opus",
+  "model": "opus[1m]",
   "effortLevel": "high",
   "alwaysThinkingEnabled": true,
   "advisorModel": "claude-fable-5-1",
@@ -32,7 +32,7 @@
       "Merging own PRs: merging pull requests in github.com/sunpar repositories with gh pr merge (--merge, --squash, --rebase, --match-head-commit, --delete-branch) without a separate human approval. The user is the only reviewer on these personal repositories. Bypassing required checks with --admin is not covered.",
       "Review threads on own PRs: resolving, unresolving and reading review threads on pull requests in github.com/sunpar repositories through gh api graphql (resolveReviewThread, unresolveReviewThread, reviewThreads queries), including threads opened by other reviewers or bots.",
       "Production database reads: read-only queries and full exports of the user's own Cloudflare D1 databases, including wealth-manager-production, with wrangler d1 execute --remote (SELECT and other read-only statements) and wrangler d1 export --remote to a local path. Writes, migrations and deletes against production are not covered.",
-      "Local git rewrites: git commit --amend of any commit, and git reset --hard to an upstream or origin/<branch> ref (for example syncing a checkout to origin/main after a merge), in the user's repositories under ~/workspace and ~/work."
+      "Local git rewrites: git commit --amend of any commit, git rebase (for example onto origin/main), and git reset --hard to an upstream or origin/<branch> ref (for example syncing a checkout to origin/main after a merge), in the user's repositories under ~/workspace and ~/work."
     ],
     "soft_deny": [
       "$defaults",
