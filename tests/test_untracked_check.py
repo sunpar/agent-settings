@@ -15,24 +15,26 @@ INSTRUCTION = (
 )
 
 
-def stop(
-    home: Path, cwd: Path, transcript: Path | None, active: bool = False
-) -> list[str] | None:
-    event = {
-        "session_id": "s1",
-        "cwd": str(cwd),
-        "hook_event_name": "Stop",
-        "stop_hook_active": active,
-        "transcript_path": str(transcript) if transcript else None,
-    }
-    out = subprocess.run(
+def hook(home: Path, event: dict) -> str:
+    return subprocess.run(
         [sys.executable, str(HOOK)],
-        input=json.dumps(event),
+        input=json.dumps({"session_id": "s1", **event}),
         env={**os.environ, "HOME": str(home)},
         capture_output=True,
         text=True,
         check=True,
     ).stdout
+
+
+def start(home: Path, cwd: Path) -> None:
+    assert hook(home, {"hook_event_name": "SessionStart", "cwd": str(cwd)}) == ""
+
+
+def stop(home: Path, cwd: Path, active: bool = False) -> list[str] | None:
+    out = hook(
+        home,
+        {"hook_event_name": "Stop", "cwd": str(cwd), "stop_hook_active": active},
+    )
     if not out:
         return None
     result = json.loads(out)
@@ -44,6 +46,10 @@ def touch(path: Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("x\n")
     return path
+
+
+def age(path: Path) -> None:
+    os.utime(path, (time.time() - 60, time.time() - 60))
 
 
 @pytest.fixture
@@ -61,57 +67,70 @@ def repo(tmp_path: Path) -> Path:
     return path
 
 
-def test_lists_each_new_path_once(home: Path, repo: Path, tmp_path: Path) -> None:
-    transcript = touch(tmp_path / "transcript.jsonl")
+def test_lists_each_new_path_once(home: Path, repo: Path) -> None:
+    start(home, repo)
     for name in ("new.py", "migrations/0001.py", "migrations/0002.py", "ignored.log"):
         touch(repo / name)
-    assert stop(home, repo / "migrations", transcript) == [
+    assert stop(home, repo / "migrations") == [
         f"Untracked files changed during this session in {repo}:",
         "  migrations/",
         "  new.py",
         INSTRUCTION,
     ]
-    assert stop(home, repo, transcript) is None
+    assert stop(home, repo) is None
     touch(repo / "later.txt")
-    assert stop(home, repo, transcript)[1:-1] == ["  later.txt"]
+    assert stop(home, repo)[1:-1] == ["  later.txt"]
 
 
-def test_caps_the_list(home: Path, repo: Path, tmp_path: Path) -> None:
-    transcript = touch(tmp_path / "transcript.jsonl")
+def test_lists_paths_past_the_cap_at_a_later_stop(home: Path, repo: Path) -> None:
+    start(home, repo)
     for n in range(25):
         touch(repo / f"f{n:02}.txt")
-    lines = stop(home, repo, transcript)[1:-1]
+    lines = stop(home, repo)[1:-1]
     assert lines[0] == "  f00.txt"
     assert lines[19] == "  f19.txt"
-    assert lines[20:] == ["  ...and 5 more"]
+    assert lines[20:] == ["  ...and 5 more, listed at a later stop"]
+    assert stop(home, repo)[1:-1] == [
+        "  f20.txt",
+        "  f21.txt",
+        "  f22.txt",
+        "  f23.txt",
+        "  f24.txt",
+    ]
 
 
-def test_skips_files_from_before_the_session(
-    home: Path, repo: Path, tmp_path: Path
+def test_skips_files_from_before_the_session(home: Path, repo: Path) -> None:
+    age(touch(repo / "old.txt"))
+    start(home, repo)
+    assert stop(home, repo) is None
+
+
+def test_lists_an_edit_inside_an_older_untracked_directory(
+    home: Path, repo: Path
 ) -> None:
-    old = touch(repo / "old.txt")
-    os.utime(old, (time.time() - 60, time.time() - 60))
-    transcript = touch(tmp_path / "transcript.jsonl")
-    assert stop(home, repo, transcript) is None
+    age(touch(repo / "notes" / "kept.txt"))
+    age(touch(repo / "notes" / "edited.txt"))
+    age(repo / "notes")
+    start(home, repo)
+    (repo / "notes" / "edited.txt").write_text("changed\n")
+    assert stop(home, repo)[1:-1] == ["  notes/"]
 
 
-def test_does_nothing_while_a_stop_hook_is_active(
-    home: Path, repo: Path, tmp_path: Path
-) -> None:
-    transcript = touch(tmp_path / "transcript.jsonl")
+def test_does_nothing_while_a_stop_hook_is_active(home: Path, repo: Path) -> None:
+    start(home, repo)
     touch(repo / "new.py")
-    assert stop(home, repo, transcript, active=True) is None
-    assert not (home / ".cache").exists()
+    assert stop(home, repo, active=True) is None
+    assert stop(home, repo)[1:-1] == ["  new.py"]
 
 
 def test_does_nothing_outside_git(home: Path, tmp_path: Path) -> None:
-    transcript = touch(tmp_path / "transcript.jsonl")
+    start(home, tmp_path)
     touch(tmp_path / "plain" / "new.py")
-    assert stop(home, tmp_path / "plain", transcript) is None
+    assert stop(home, tmp_path / "plain") is None
 
 
-def test_without_transcript_starts_at_first_stop(home: Path, repo: Path) -> None:
+def test_without_session_start_begins_at_first_stop(home: Path, repo: Path) -> None:
     touch(repo / "first.txt")
-    assert stop(home, repo, None) is None
+    assert stop(home, repo) is None
     touch(repo / "second.txt")
-    assert stop(home, repo, None)[1:-1] == ["  second.txt"]
+    assert stop(home, repo)[1:-1] == ["  second.txt"]
