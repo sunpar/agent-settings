@@ -2,6 +2,8 @@
 
 Guidance for Claude Code, Codex and other coding agents: surface assumptions, don't overcomplicate, make surgical changes, verify before moving on.
 
+Project instruction files are more specific than this one: where they differ, follow the project's file.
+
 ## Core Principles
 
 **Do what was asked. Nothing more, nothing less.**
