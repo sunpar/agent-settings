@@ -34,6 +34,13 @@ Before writing Python, read the `python-guidelines` skill's `references/` files.
 - **Package manager and paths**: Use uv, not pip, and pathlib, not os.path. Activate `.venv` or use `uv run python -c "..."`.
 - **Verify before planning**: Run Python probes to test hypotheses. Integrate into existing code and match its patterns; don't assume or append.
 
+## TypeScript and React
+
+- **State follows its entity**: key or reset per-entity state (selection, drafts, error overlays) when the selected entity changes or disappears.
+- **Only the latest request writes**: drop or abort responses from requests that are no longer current, and invalidate every cached query a mutation changes.
+- **Say what actually happened**: loading, empty, error and stale data each render differently, and copy never claims more than happened (no "Saved" while edits remain, no bare "—").
+- **Parse external data**: validate API responses where they arrive instead of casting with `as` or `!`.
+
 ## Testing
 
 - A test for a change must fail without it: drive the real entry point, include a negative or near-miss input (empty, zero, duplicate key, malformed, another format), and assert literal expected values, not values computed by the code under test.
