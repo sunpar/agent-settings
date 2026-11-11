@@ -6,7 +6,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'CMD=$(jq -r \".tool_input.command\"); S=$(printf \"%s\" \"$CMD\" | sed -e \"s/'\\''[^'\\'']*'\\''//g\" -e \"s/\\\"[^\\\"]*\\\"//g\"); if printf \"%s\" \"$S\" | grep -qE \"(^|[;&|(){}]|[[:space:]]do|[[:space:]]then|[[:space:]]else)[[:space:]]*timeout[[:space:]]\"; then printf \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PreToolUse\\\",\\\"permissionDecision\\\":\\\"deny\\\",\\\"permissionDecisionReason\\\":\\\"macOS has no timeout command on this host, so timeout N ... exits 127 with empty output and silently hides the real result (a remote ssh sweep can look idle when it is not). Use ssh -o ConnectTimeout=N, or gtimeout N (brew coreutils), or for a remote Linux host put timeout inside the ssh quotes.\\\"}}\"; fi'"
+            "command": "bash -c 'CMD=$(jq -r \".tool_input.command\"); S=$(printf \"%s\" \"$CMD\" | tr \"\\n\" \";\" | sed -e \"s/'\\''[^'\\'']*'\\''//g\" -e \"s/\\\"[^\\\"]*\\\"//g\"); if printf \"%s\" \"$S\" | grep -qE \"(^|[;&|(){}]|[[:space:]]do|[[:space:]]then|[[:space:]]else)[[:space:]]*timeout[[:space:]]\"; then printf \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PreToolUse\\\",\\\"permissionDecision\\\":\\\"deny\\\",\\\"permissionDecisionReason\\\":\\\"macOS has no timeout command on this host, so timeout N ... exits 127 with empty output and silently hides the real result (a remote ssh sweep can look idle when it is not). Use ssh -o ConnectTimeout=N, or gtimeout N (brew coreutils), or for a remote Linux host put timeout inside the ssh quotes.\\\"}}\"; fi'"
+          },
+          {
+            "type": "command",
+            "command": "bash -c 'CMD=$(jq -r \".tool_input.command\"); S=$(printf \"%s\" \"$CMD\" | tr \"\\n\" \";\" | sed -e \"s/'\\''[^'\\'']*'\\''//g\" -e \"s/\\\"[^\\\"]*\\\"//g\"); if printf \"%s\" \"$S\" | grep -qE \"(^|[;&|(){}]|[[:space:]]do|[[:space:]]then|[[:space:]]else)[[:space:]]*(python3? -m )?pip3? install\"; then printf \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PreToolUse\\\",\\\"permissionDecision\\\":\\\"deny\\\",\\\"permissionDecisionReason\\\":\\\"Use uv, not pip: uv add <pkg> in a project, uv pip install inside a uv-managed venv, or uv run --with <pkg> for a one-off.\\\"}}\"; fi'"
           }
         ]
       },
@@ -31,6 +35,28 @@
             "command": "python3 \"{{REPO}}/hooks/edit_checks.py\" post",
             "timeout": 120,
             "statusMessage": "Formatting, linting, type-checking"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"{{REPO}}/hooks/untracked_check.py\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"{{REPO}}/hooks/untracked_check.py\"",
+            "timeout": 30
           }
         ]
       }

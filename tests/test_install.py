@@ -128,6 +128,10 @@ def test_claude_settings_merge(home: Path) -> None:
     ]
     assert "old" not in commands
     assert f'python3 "{REPO}/hooks/edit_checks.py" pre' in commands
+    for event in ("SessionStart", "Stop"):
+        assert settings["hooks"][event][0]["hooks"][0]["command"] == (
+            f'python3 "{REPO}/hooks/untracked_check.py"'
+        )
 
 
 def test_codex_config_merge(home: Path) -> None:
@@ -155,6 +159,7 @@ def test_codex_hooks_and_rules(home: Path) -> None:
     hooks = (home / ".codex/hooks.json").read_text()
     assert not (home / ".codex/hooks.json").is_symlink()
     assert f'python3 \\"{REPO}/hooks/edit_checks.py\\" pre' in hooks
+    assert hooks.count(f'python3 \\"{REPO}/hooks/untracked_check.py\\"') == 2
     assert "{{" not in hooks
     rules = (home / ".codex/rules/default.rules").read_text().splitlines()
     assert rules[0] == 'prefix_rule(pattern=["my-approved"], decision="allow")'
