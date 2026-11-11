@@ -1,6 +1,6 @@
 # Agent Guidance
 
-Guidance for Claude Code, Codex and other coding agents. Structured around Andrej Karpathy's observations on LLM coding pitfalls: surface assumptions, don't overcomplicate, make surgical changes, verify before moving on.
+Guidance for Claude Code, Codex and other coding agents: surface assumptions, don't overcomplicate, make surgical changes, verify before moving on.
 
 ## Core Principles
 
