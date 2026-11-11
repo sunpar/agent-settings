@@ -20,7 +20,7 @@ Project instruction files are more specific than this one: where they differ, fo
 - When a change renames or alters a field, flag, route, path, command or format, `rg` for every definition, reader, test and doc that uses it and update them in the same change.
 - Before finishing, check each requirement in the request against the diff and `git status`, and name any you did not meet.
 - In docs and reports, every claim names the command that measured it. Prefer editing existing files; never create docs (*.md, README) unless asked.
-- Write commit messages that someone unfamiliar with the repo would understand.
+- Write commit messages and replies for someone who hasn't seen your working: define any internal name, number or path you mention, and say what it means for the user.
 - Before committing to an approach, and after two failed attempts at the same problem, get a second opinion with `/codex-advisor`.
 - Use the `writing-guidelines` skill to review documentation or interface copy.
 - Use the `anthropic-frontend-design` or `openai-frontend-design` skill when creating or reshaping a UI.
