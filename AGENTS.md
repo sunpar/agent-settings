@@ -1,8 +1,6 @@
 # Agent Guidance
 
-Guidance for Claude Code, Codex and other coding agents: surface assumptions, don't overcomplicate, make surgical changes, verify before moving on.
-
-Project instruction files are more specific than this one: where they differ, follow the project's file.
+Where instructions differ, follow the user's request first, then the project's instruction files, then this file.
 
 ## Core Principles
 
@@ -20,8 +18,8 @@ Project instruction files are more specific than this one: where they differ, fo
 - When a change renames or alters a field, flag, route, path, command or format, `rg` for every definition, reader, test and doc that uses it and update them in the same change.
 - Before finishing, check each requirement in the request against the diff and `git status`, and name any you did not meet.
 - In docs and reports, every claim names the command that measured it. Prefer editing existing files; never create docs (*.md, README) unless asked.
-- Write commit messages that someone unfamiliar with the repo would understand.
-- Before committing to an approach, and after two failed attempts at the same problem, get a second opinion with `/codex-advisor`.
+- Write commit messages and replies for someone who hasn't seen your working: define any internal name, number or path you mention, and say what it means for the user.
+- Before committing to an approach on a non-trivial change, and after two failed attempts at the same problem, get a second opinion from the other vendor's model: the `codex-advisor` skill in Claude Code, `fable-advisor` in Codex.
 - Use the `writing-guidelines` skill to review documentation or interface copy.
 - Use the `anthropic-frontend-design` or `openai-frontend-design` skill when creating or reshaping a UI.
 
@@ -33,8 +31,8 @@ Use `gh` CLI for all GitHub interactions. Never clone repositories to read code.
 
 Before writing Python, read the `python-guidelines` skill's `references/` files. Key rules always in effect:
 
-- **Package manager and paths**: Use uv, not pip, and pathlib, not os.path. Activate `.venv` or use `uv run python -c "..."`.
-- **Verify before planning**: Run Python probes to test hypotheses. Integrate into existing code and match its patterns; don't assume or append.
+- **Paths and probes**: Use pathlib, not os.path. Activate `.venv` or use `uv run python -c "..."`.
+- **Verify before planning**: Run Python probes to test hypotheses before planning around them.
 
 ## TypeScript and React
 
