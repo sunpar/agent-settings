@@ -23,7 +23,8 @@ GOOD
 
 Open the description with a simple explanation of the problem based on the
 user's original prompt, then briefly explain the solution. Do not lead with an
-implementation inventory:
+implementation inventory. The examples show that order, not a voice to copy;
+write in the repository's own style:
 
 BAD
 
