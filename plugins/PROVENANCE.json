@@ -6,9 +6,15 @@
     "skill-creator"
   ],
   "phd-skills": "/Users/sunpar/.claude/plugins/cache/claude-settings/phd-skills/1.3.0",
+  "pstack": {
+    "upstream": "cursor/plugins/harness/pstack/claude-code",
+    "commit": "93b916d4a1e806507e22f4716b352fa91f2b227e",
+    "version": "0.15.43"
+  },
   "simplify": {
     "upstream": "fcakyon/claude-codex-settings/plugins/simplify",
-    "version": "1.1.9",
+    "commit": "eab1c98c94735d3f3b4bec5d7821b2be7171f796",
+    "version": "1.1.15",
     "localChange": "Normalize argv and shell -c/-lc command payloads before tokenization."
   }
 }

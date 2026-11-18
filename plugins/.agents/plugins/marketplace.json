@@ -5,10 +5,12 @@
   },
   "plugins": [
     {
-      "name": "phd-skills",
+      "name": "labrat",
       "source": {
-        "source": "local",
-        "path": "./phd-skills"
+        "source": "git-subdir",
+        "url": "https://github.com/fcakyon/labrat.git",
+        "sha": "a2b04ef958753d8a62ecf6039a029b81d1d8eb29",
+        "path": "plugin"
       },
       "policy": {
         "installation": "AVAILABLE",

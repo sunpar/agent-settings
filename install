@@ -12,10 +12,12 @@ import argparse
 import json
 import os
 import shutil
+import subprocess
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
+from threading import Timer
 from typing import Any, Literal
 
 import tomlkit
@@ -124,10 +126,25 @@ REGISTRY: dict[Harness, tuple[Op, ...]] = {
             ("codex/config.toml",),
             ".codex/config.toml",
             retire=(
+                ("marketplaces", "claude-plugins-official"),
                 ("marketplaces", "claude-settings-compat"),
                 ("marketplaces", "cursor-plugins"),
+                ("marketplaces", "openai-codex"),
                 ("plugins", "anthropic-essentials@agent-settings"),
+                ("plugins", "bio-research@claude-cowork"),
+                ("plugins", "claude-md-management@claude-plugins-official"),
+                ("plugins", "claude-tools@claude-settings"),
+                ("plugins", "codex@openai-codex"),
+                ("plugins", "cowork-plugin-management@claude-cowork"),
+                ("plugins", "desktop-commander@claude-cowork"),
+                ("plugins", "feature-dev@claude-plugins-official"),
+                ("plugins", "frontend-design@claude-plugins-official"),
+                ("plugins", "intelligent-compact@claude-settings"),
+                ("plugins", "phd-skills@agent-settings"),
+                ("plugins", "product-tracking-skills@claude-cowork"),
                 ("plugins", "pstack@cursor-plugins"),
+                ("plugins", "skill-creator@claude-plugins-official"),
+                ("plugins", "superpowers@claude-plugins-official"),
                 *(("plugins", f"{name}@claude-settings-compat") for name in ("anthropic-essentials", "phd-skills", "simplify")),
             ),
         ),
@@ -187,6 +204,15 @@ def merge(live: dict, repo: dict, union: frozenset[KeyPath], path: KeyPath = ())
         old = live.get(key)
         if isinstance(value, dict) and isinstance(old, dict):
             drift += merge(old, value, union, keys)
+        elif keys == ("skills", "config") and isinstance(old, list):
+            selectors = {(rule.get("name"), rule.get("path")) for rule in value}
+            rules = [
+                rule for rule in old
+                if (rule.get("name"), rule.get("path")) not in selectors
+            ] + list(value)
+            if unwrap(old) != [unwrap(rule) for rule in rules]:
+                drift.append(f"{dotted}: update repo skill selectors")
+                live[key] = rules
         elif keys in union and isinstance(old, list):
             missing = [item for item in value if item not in old]
             old.extend(missing)
@@ -291,23 +317,78 @@ def apply(changes: list[Change], backup_root: Path) -> None:
         write(change)
 
 
+def refresh_codex_plugins(codex: str) -> None:
+    """Materialize configured packages through Codex without enabling disabled plugins."""
+    profile = tomlkit.parse(render("codex/config.toml"))
+    expected = {
+        plugin for plugin in profile["plugins"]
+        if plugin.rsplit("@", 1)[-1] in profile["marketplaces"]
+    }
+    with subprocess.Popen(
+        [codex, "app-server", "--stdio"],
+        env={**os.environ, "CODEX_HOME": str(HOME / ".codex")},
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        text=True,
+    ) as server:
+        assert server.stdin is not None and server.stdout is not None
+
+        def send(method: str, **fields: Any) -> None:
+            request = {"jsonrpc": "2.0", "method": method, **fields}
+            server.stdin.write(json.dumps(request) + "\n")
+            server.stdin.flush()
+
+        timeout = Timer(180, server.kill)
+        timeout.start()
+        try:
+            send("initialize", id=1, params={
+                "clientInfo": {"name": "agent-settings", "version": "1"},
+                "capabilities": {"experimentalApi": True},
+            })
+            for line in server.stdout:
+                response = json.loads(line)
+                if response.get("id") not in (1, 2):
+                    continue
+                if "error" in response:
+                    raise SystemExit(f"Codex plugin refresh failed: {response['error']['message']}")
+                if response["id"] == 1:
+                    send("initialized")
+                    send("plugin/list", id=2, params={"marketplaceKinds": ["local"], "forceRefetch": True})
+                    continue
+                installed = {
+                    plugin["id"]
+                    for marketplace in response["result"]["marketplaces"]
+                    for plugin in marketplace["plugins"]
+                    if plugin["installed"]
+                }
+                if missing := expected - installed:
+                    raise SystemExit(f"Codex could not install {', '.join(sorted(missing))}. Rerun ./install codex to retry.")
+                return
+            raise SystemExit("Codex closed the plugin refresh before it completed. Rerun ./install codex to retry.")
+        finally:
+            timeout.cancel()
+            server.kill()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Install agent settings into Claude Code and Codex.")
     parser.add_argument("harness", nargs="*", choices=list(REGISTRY), help="harnesses to install (default: all)")
     parser.add_argument("--dry-run", action="store_true", help="print the plan without writing anything")
     args = parser.parse_args()
-    changes = plan(tuple(op for harness in args.harness or REGISTRY for op in REGISTRY[harness]))
-    if not changes:
-        print("up to date")
-        return
+    harnesses = args.harness or REGISTRY
+    changes = plan(tuple(op for harness in harnesses for op in REGISTRY[harness]))
     for change in changes:
         print("\n".join(change.lines))
-    if args.dry_run:
-        return
-    backup_root = HOME / ".local/state/agent-settings/backups" / datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-    apply(changes, backup_root)
-    if backup_root.exists():
-        print(f"backups in {tilde(backup_root)}")
+    if not args.dry_run:
+        if changes:
+            backup_root = HOME / ".local/state/agent-settings/backups" / datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+            apply(changes, backup_root)
+            if backup_root.exists():
+                print(f"backups in {tilde(backup_root)}")
+        if "codex" in harnesses and (codex := shutil.which("codex")):
+            refresh_codex_plugins(codex)
+    if not changes:
+        print("up to date")
 
 
 if __name__ == "__main__":

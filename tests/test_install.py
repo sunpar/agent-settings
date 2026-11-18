@@ -10,16 +10,49 @@ import pytest
 
 REPO = Path(__file__).resolve().parent.parent
 BACKUPS = Path(".local/state/agent-settings/backups")
+RETIRED_CODEX_PLUGINS = (
+    "anthropic-essentials@agent-settings",
+    "bio-research@claude-cowork",
+    "claude-md-management@claude-plugins-official",
+    "claude-tools@claude-settings",
+    "codex@openai-codex",
+    "cowork-plugin-management@claude-cowork",
+    "desktop-commander@claude-cowork",
+    "feature-dev@claude-plugins-official",
+    "frontend-design@claude-plugins-official",
+    "intelligent-compact@claude-settings",
+    "phd-skills@agent-settings",
+    "product-tracking-skills@claude-cowork",
+    "skill-creator@claude-plugins-official",
+    "superpowers@claude-plugins-official",
+)
+DISABLED_CODEX_PLUGINS = (
+    "agent-browser@claude-settings",
+    "cloudflare-skills@claude-settings",
+    "data@claude-cowork",
+    "design@claude-cowork",
+    "engineering@claude-cowork",
+    "finance@claude-cowork",
+    "google-drive@openai-curated",
+    "labrat@agent-settings",
+    "miro@claude-cowork",
+    "openobserve-skills@claude-settings",
+    "product-management@claude-cowork",
+)
+
+
+def run_installer(home: Path, *args: str, path: str = "") -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, str(REPO / "install"), *args],
+        env={**os.environ, "HOME": str(home), "PATH": path},
+        capture_output=True,
+        text=True,
+    )
 
 
 def run(home: Path, *args: str) -> str:
-    result = subprocess.run(
-        [sys.executable, str(REPO / "install"), *args],
-        env={**os.environ, "HOME": str(home)},
-        capture_output=True,
-        text=True,
-        check=True,
-    )
+    result = run_installer(home, *args)
+    result.check_returncode()
     return result.stdout
 
 
@@ -36,6 +69,35 @@ def snapshot(root: Path) -> dict[str, str]:
 def write(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text)
+
+
+def test_codex_install_refresh_requires_configured_packages(tmp_path: Path) -> None:
+    bin_dir = tmp_path / "bin"
+    codex = bin_dir / "codex"
+    write(
+        codex,
+        f"#!{sys.executable}\n"
+        "import json, sys\n"
+        "assert sys.argv[1:] == ['app-server', '--stdio']\n"
+        "assert json.loads(input())['method'] == 'initialize'\n"
+        "print(json.dumps({'id': 1, 'result': {}}), flush=True)\n"
+        "assert json.loads(input())['method'] == 'initialized'\n"
+        "request = json.loads(input())\n"
+        "assert request['method'] == 'plugin/list'\n"
+        "assert request['params'] == {'marketplaceKinds': ['local'], 'forceRefetch': True}\n"
+        "print(json.dumps({'id': 2, 'result': {'marketplaces': []}}), flush=True)\n",
+    )
+    codex.chmod(0o755)
+    home = tmp_path / "home"
+    assert run_installer(home, "codex", "--dry-run", path=str(bin_dir)).returncode == 0
+    assert not (home / ".codex/config.toml").exists()
+    result = run_installer(home, "codex", path=str(bin_dir))
+    assert result.returncode == 1
+    assert (home / ".codex/config.toml").is_file()
+    assert "Codex could not install" in result.stderr
+    assert "labrat@agent-settings" in result.stderr
+    assert "pstack@agent-settings" in result.stderr
+    assert "google-drive@openai-curated-remote" not in result.stderr
 
 
 @pytest.fixture
@@ -77,8 +139,15 @@ def home(tmp_path: Path) -> Path:
         '[projects."/x"]\ntrust_level = "trusted"\n\n'
         '[hooks.state."/h/hooks.json:pre_tool_use:0:0"]\ntrusted_hash = "abc"\n\n'
         '[plugins."pstack@cursor-plugins"]\nenabled = true\n\n'
-        '[plugins."anthropic-essentials@agent-settings"]\nenabled = true\n\n'
-        '[marketplaces.cursor-plugins]\nsource_type = "git"\nsource = "https://github.com/cursor/plugins.git"\n',
+        + "".join(
+            f'[plugins."{name}"]\nenabled = true\n\n'
+            for name in (*RETIRED_CODEX_PLUGINS, *DISABLED_CODEX_PLUGINS)
+        )
+        + '[marketplaces.cursor-plugins]\nsource_type = "git"\nsource = "https://github.com/cursor/plugins.git"\n\n'
+        '[marketplaces.openai-codex]\nsource_type = "git"\nsource = "https://example.invalid/bridge.git"\n\n'
+        '[marketplaces.claude-plugins-official]\nsource_type = "git"\nsource = "https://example.invalid/marketplace.git"\n\n'
+        f'[[skills.config]]\npath = "{tmp_path}/local-skill/SKILL.md"\nenabled = false\n\n'
+        '[[skills.config]]\nname = "pages:write-page"\nenabled = true\n',
     )
     write(
         tmp_path / ".codex/rules/default.rules",
@@ -146,14 +215,23 @@ def test_codex_config_merge(home: Path) -> None:
     }
     assert config["model"] != "old-model"
     assert "pstack@cursor-plugins" not in config["plugins"]
-    assert "anthropic-essentials@agent-settings" not in config["plugins"]
+    assert set(RETIRED_CODEX_PLUGINS).isdisjoint(config["plugins"])
+    for name in DISABLED_CODEX_PLUGINS:
+        assert config["plugins"][name]["enabled"] is False
     assert config["plugins"]["pstack@agent-settings"] == {"enabled": True}
     assert "cursor-plugins" not in config["marketplaces"]
+    assert "openai-codex" not in config["marketplaces"]
+    assert "claude-plugins-official" not in config["marketplaces"]
     assert config["marketplaces"]["agent-settings"] == {
         "source_type": "local",
         "source": f"{REPO}/plugins",
     }
     assert config["notify"][0].startswith(f"{home}/.codex/")
+    rules = config["skills"]["config"]
+    assert rules[0] == {"path": str(home / "local-skill/SKILL.md"), "enabled": False}
+    assert [rule for rule in rules if rule.get("name") == "pages:write-page"] == [
+        {"name": "pages:write-page", "enabled": False}
+    ]
 
 
 def test_codex_hooks_and_rules(home: Path) -> None:
@@ -230,8 +308,21 @@ def test_fresh_home(tmp_path: Path) -> None:
         ]
         is True
     )
-    codex_plugins = tomllib.loads((tmp_path / ".codex/config.toml").read_text())["plugins"]
-    assert "anthropic-essentials@agent-settings" not in codex_plugins
+    codex_config = tomllib.loads((tmp_path / ".codex/config.toml").read_text())
+    codex_plugins = codex_config["plugins"]
+    assert set(RETIRED_CODEX_PLUGINS).isdisjoint(codex_plugins)
+    assert "openai-codex" not in codex_config["marketplaces"]
+    for name in DISABLED_CODEX_PLUGINS:
+        assert codex_plugins[name]["enabled"] is False
+    assert codex_plugins["product-tracking@claude-cowork"] == {"enabled": True}
     assert codex_plugins["pstack@agent-settings"] == {"enabled": True}
+    for name in ("app-68de829bf7648191acd70a907364c67c", "google-drive", "pages", "sites"):
+        assert codex_plugins[f"{name}@openai-curated-remote"] == {"enabled": True}
+    assert codex_config["marketplaces"]["claude-cowork"] == {
+        "source_type": "local",
+        "source": f"{REPO}/codex/marketplaces/claude-cowork",
+    }
+    assert codex_config["marketplaces"]["mattpocock"]["source"] == "https://github.com/mattpocock/skills.git"
+    assert len(codex_config["skills"]["config"]) == 16
     assert not (tmp_path / BACKUPS).exists()
     assert run(tmp_path).strip() == "up to date"

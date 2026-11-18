@@ -20,7 +20,7 @@ max_concurrent_threads_per_session = 8
 enabled = true
 
 [plugins."superpowers@openai-curated"]
-enabled = true
+enabled = false
 
 [plugins."build-web-apps@openai-curated"]
 enabled = true
@@ -29,7 +29,7 @@ enabled = true
 enabled = true
 
 [plugins."google-drive@openai-curated"]
-enabled = true
+enabled = false
 
 [plugins."documents@openai-primary-runtime"]
 enabled = false
@@ -95,7 +95,7 @@ enabled = false
 enabled = false
 
 [plugins."google-drive@openai-curated-remote"]
-enabled = false
+enabled = true
 
 [plugins."openai-developers@openai-curated-remote"]
 enabled = false
@@ -104,10 +104,16 @@ enabled = false
 enabled = false
 
 [plugins."superpowers@openai-curated-remote"]
-enabled = false
+enabled = true
 
 [plugins."app-68de829bf7648191acd70a907364c67c@openai-curated-remote"]
-enabled = false
+enabled = true
+
+[plugins."pages@openai-curated-remote"]
+enabled = true
+
+[plugins."sites@openai-curated-remote"]
+enabled = true
 
 [plugins."public-equity-investing@openai-curated-remote"]
 enabled = false
@@ -131,78 +137,70 @@ enabled = true
 enabled = true
 
 [plugins."agent-browser@claude-settings"]
-enabled = true
+enabled = false
 
 [plugins."frontend-design-skills@claude-settings"]
 enabled = true
 
 [plugins."cloudflare-skills@claude-settings"]
-enabled = true
+enabled = false
 
 [plugins."web-performance-skills@claude-settings"]
 enabled = true
 
 [plugins."openobserve-skills@claude-settings"]
-enabled = true
+enabled = false
 
 [plugins."github-dev@claude-settings"]
-enabled = true
-
-[plugins."claude-tools@claude-settings"]
 enabled = true
 
 [plugins."fable-advisor@claude-settings"]
 enabled = true
 
-[plugins."phd-skills@agent-settings"]
-enabled = true
+[plugins."labrat@agent-settings"]
+enabled = false
 
 [plugins."simplify@agent-settings"]
 enabled = true
 
-[plugins."intelligent-compact@claude-settings"]
-enabled = true
-
-[plugins."codex@openai-codex"]
-enabled = true
-
-[plugins."bio-research@claude-cowork"]
-enabled = true
-
-[plugins."cowork-plugin-management@claude-cowork"]
-enabled = true
-
 [plugins."data@claude-cowork"]
-enabled = true
+enabled = false
+mcp_servers = { "amplitude" = { enabled = false }, "amplitude-eu" = { enabled = false }, "atlassian" = { enabled = false }, "bigquery" = { enabled = false }, "databricks" = { enabled = false }, "definite" = { enabled = false }, "hex" = { enabled = false }, "snowflake" = { enabled = false } }
 
 [plugins."design@claude-cowork"]
-enabled = true
-
-[plugins."desktop-commander@claude-cowork"]
-enabled = true
+enabled = false
+mcp_servers = { "asana" = { enabled = false }, "atlassian" = { enabled = false }, "figma" = { enabled = false }, "gmail" = { enabled = false }, "google calendar" = { enabled = false }, "intercom" = { enabled = false }, "linear" = { enabled = false }, "notion" = { enabled = false }, "slack" = { enabled = false } }
 
 [plugins."engineering@claude-cowork"]
-enabled = true
+enabled = false
+mcp_servers = { "asana" = { enabled = false }, "atlassian" = { enabled = false }, "datadog" = { enabled = false }, "github" = { enabled = false }, "gmail" = { enabled = false }, "google calendar" = { enabled = false }, "linear" = { enabled = false }, "notion" = { enabled = false }, "pagerduty" = { enabled = false }, "slack" = { enabled = false } }
 
 [plugins."finance@claude-cowork"]
-enabled = true
+enabled = false
+mcp_servers = { "bigquery" = { enabled = false }, "databricks" = { enabled = false }, "gmail" = { enabled = false }, "google calendar" = { enabled = false }, "slack" = { enabled = false }, "snowflake" = { enabled = false } }
 
 [plugins."miro@claude-cowork"]
-enabled = true
+enabled = false
+mcp_servers = { "miro" = { enabled = false } }
 
 [plugins."modern-web-guidance@claude-cowork"]
 enabled = true
 
 [plugins."product-management@claude-cowork"]
-enabled = true
+enabled = false
+mcp_servers = { "amplitude" = { enabled = false }, "amplitude-eu" = { enabled = false }, "asana" = { enabled = false }, "atlassian" = { enabled = false }, "clickup" = { enabled = false }, "figma" = { enabled = false }, "fireflies" = { enabled = false }, "gmail" = { enabled = false }, "google calendar" = { enabled = false }, "intercom" = { enabled = false }, "linear" = { enabled = false }, "monday" = { enabled = false }, "notion" = { enabled = false }, "pendo" = { enabled = false }, "similarweb" = { enabled = false }, "slack" = { enabled = false } }
 
-[plugins."product-tracking-skills@claude-cowork"]
+[plugins."product-tracking@claude-cowork"]
 enabled = true
 
 [plugins."productivity@claude-cowork"]
 enabled = true
+mcp_servers = { "asana" = { enabled = false }, "atlassian" = { enabled = false }, "clickup" = { enabled = false }, "gmail" = { enabled = false }, "google calendar" = { enabled = false }, "linear" = { enabled = false }, "monday" = { enabled = false }, "notion" = { enabled = false }, "slack" = { enabled = false } }
 
 [plugins."pstack@agent-settings"]
+enabled = true
+
+[plugins."mattpocock-skills@mattpocock"]
 enabled = true
 
 [tui]
@@ -211,10 +209,16 @@ status_line = [ "model-with-reasoning", "context-used", "weekly-limit", "task-pr
 [marketplaces.claude-settings]
 source_type = "git"
 source = "https://github.com/fcakyon/claude-codex-settings.git"
+ref = "eab1c98c94735d3f3b4bec5d7821b2be7171f796"
 
-[marketplaces.openai-codex]
+[marketplaces.claude-cowork]
+source_type = "local"
+source = "{{REPO}}/codex/marketplaces/claude-cowork"
+
+[marketplaces.mattpocock]
 source_type = "git"
-source = "https://github.com/openai/codex-plugin-cc.git"
+source = "https://github.com/mattpocock/skills.git"
+ref = "5863806dd4e15c63174bee4e7515a4256792ecfa"
 
 [marketplaces.agent-settings]
 source_type = "local"
@@ -258,3 +262,66 @@ policy = "## Environment Profile\n- Organization: Personal development for sunpa
 [analytics]
 enabled = false
 
+[[skills.config]]
+name = "app-68de829bf7648191acd70a907364c67c:browse-collections"
+enabled = false
+
+[[skills.config]]
+name = "app-68de829bf7648191acd70a907364c67c:build-playlists"
+enabled = false
+
+[[skills.config]]
+name = "app-68de829bf7648191acd70a907364c67c:manage-library"
+enabled = false
+
+[[skills.config]]
+name = "app-68de829bf7648191acd70a907364c67c:now-playing"
+enabled = false
+
+[[skills.config]]
+name = "app-68de829bf7648191acd70a907364c67c:search-spotify"
+enabled = false
+
+[[skills.config]]
+name = "google-drive:google-docs"
+enabled = false
+
+[[skills.config]]
+name = "google-drive:google-drive"
+enabled = false
+
+[[skills.config]]
+name = "google-drive:google-drive-comments"
+enabled = false
+
+[[skills.config]]
+name = "google-drive:google-sheets"
+enabled = false
+
+[[skills.config]]
+name = "google-drive:google-slides"
+enabled = false
+
+[[skills.config]]
+name = "pages:maintain-space"
+enabled = false
+
+[[skills.config]]
+name = "pages:manage-schedules"
+enabled = false
+
+[[skills.config]]
+name = "pages:organize-space"
+enabled = false
+
+[[skills.config]]
+name = "pages:write-page"
+enabled = false
+
+[[skills.config]]
+name = "sites:sites"
+enabled = false
+
+[[skills.config]]
+name = "sites:sites-remix"
+enabled = false

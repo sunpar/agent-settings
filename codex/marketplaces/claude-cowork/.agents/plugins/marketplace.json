@@ -1,0 +1,132 @@
+{
+  "name": "claude-cowork",
+  "interface": {
+    "displayName": "Cowork workflows"
+  },
+  "plugins": [
+    {
+      "name": "data",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/knowledge-work-plugins.git",
+        "sha": "e91a134584eb798bac7fb0379358006a2b63b965",
+        "path": "data"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "developer-tools"
+    },
+    {
+      "name": "design",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/knowledge-work-plugins.git",
+        "sha": "e91a134584eb798bac7fb0379358006a2b63b965",
+        "path": "design"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "developer-tools"
+    },
+    {
+      "name": "engineering",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/knowledge-work-plugins.git",
+        "sha": "e91a134584eb798bac7fb0379358006a2b63b965",
+        "path": "engineering"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "developer-tools"
+    },
+    {
+      "name": "finance",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/knowledge-work-plugins.git",
+        "sha": "e91a134584eb798bac7fb0379358006a2b63b965",
+        "path": "finance"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "developer-tools"
+    },
+    {
+      "name": "miro",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/miroapp/miro-ai.git",
+        "sha": "b6408e1bdfe0c842f209d40b52e92caf118a4d39",
+        "path": "codex-plugins/miro"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "developer-tools"
+    },
+    {
+      "name": "modern-web-guidance",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/GoogleChrome/modern-web-guidance.git",
+        "sha": "64a6d708f5a43f2cd3fde5d4d7db3905ba1bdf65"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "developer-tools"
+    },
+    {
+      "name": "product-management",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/knowledge-work-plugins.git",
+        "sha": "e91a134584eb798bac7fb0379358006a2b63b965",
+        "path": "product-management"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "developer-tools"
+    },
+    {
+      "name": "product-tracking",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/accoil/product-tracking-skills.git",
+        "sha": "91ae6a6267804e83a792b477f348d00c51d1a6cf"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "developer-tools"
+    },
+    {
+      "name": "productivity",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/anthropics/knowledge-work-plugins.git",
+        "sha": "e91a134584eb798bac7fb0379358006a2b63b965",
+        "path": "productivity"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "developer-tools"
+    }
+  ]
+}
