@@ -77,6 +77,7 @@ def home(tmp_path: Path) -> Path:
         '[projects."/x"]\ntrust_level = "trusted"\n\n'
         '[hooks.state."/h/hooks.json:pre_tool_use:0:0"]\ntrusted_hash = "abc"\n\n'
         '[plugins."pstack@cursor-plugins"]\nenabled = true\n\n'
+        '[plugins."anthropic-essentials@agent-settings"]\nenabled = true\n\n'
         '[marketplaces.cursor-plugins]\nsource_type = "git"\nsource = "https://github.com/cursor/plugins.git"\n',
     )
     write(
@@ -145,6 +146,7 @@ def test_codex_config_merge(home: Path) -> None:
     }
     assert config["model"] != "old-model"
     assert "pstack@cursor-plugins" not in config["plugins"]
+    assert "anthropic-essentials@agent-settings" not in config["plugins"]
     assert config["plugins"]["pstack@agent-settings"] == {"enabled": True}
     assert "cursor-plugins" not in config["marketplaces"]
     assert config["marketplaces"]["agent-settings"] == {
@@ -228,8 +230,8 @@ def test_fresh_home(tmp_path: Path) -> None:
         ]
         is True
     )
-    assert tomllib.loads((tmp_path / ".codex/config.toml").read_text())["plugins"][
-        "pstack@agent-settings"
-    ] == {"enabled": True}
+    codex_plugins = tomllib.loads((tmp_path / ".codex/config.toml").read_text())["plugins"]
+    assert "anthropic-essentials@agent-settings" not in codex_plugins
+    assert codex_plugins["pstack@agent-settings"] == {"enabled": True}
     assert not (tmp_path / BACKUPS).exists()
     assert run(tmp_path).strip() == "up to date"

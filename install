@@ -126,6 +126,7 @@ REGISTRY: dict[Harness, tuple[Op, ...]] = {
             retire=(
                 ("marketplaces", "claude-settings-compat"),
                 ("marketplaces", "cursor-plugins"),
+                ("plugins", "anthropic-essentials@agent-settings"),
                 ("plugins", "pstack@cursor-plugins"),
                 *(("plugins", f"{name}@claude-settings-compat") for name in ("anthropic-essentials", "phd-skills", "simplify")),
             ),

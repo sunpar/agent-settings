@@ -154,9 +154,6 @@ enabled = true
 [plugins."fable-advisor@claude-settings"]
 enabled = true
 
-[plugins."anthropic-essentials@agent-settings"]
-enabled = true
-
 [plugins."phd-skills@agent-settings"]
 enabled = true
 

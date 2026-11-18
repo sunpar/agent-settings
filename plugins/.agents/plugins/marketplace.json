@@ -5,18 +5,6 @@
   },
   "plugins": [
     {
-      "name": "anthropic-essentials",
-      "source": {
-        "source": "local",
-        "path": "./anthropic-essentials"
-      },
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "developer-tools"
-    },
-    {
       "name": "phd-skills",
       "source": {
         "source": "local",
