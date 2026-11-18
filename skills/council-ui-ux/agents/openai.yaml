@@ -1,0 +1,4 @@
+interface:
+  display_name: "Council UI/UX"
+  short_description: "Review app design with screenshots and council scores"
+  default_prompt: "Use $council-ui-ux to review this app and show screenshots, each council member's score, and the highest-priority improvements."
