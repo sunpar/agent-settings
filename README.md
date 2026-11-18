@@ -3,7 +3,7 @@
 Global instructions, skills, hooks, settings, and plugins for Claude Code and Codex, installed from one repo.
 
 - `AGENTS.md`: global instructions for both tools (`CLAUDE.md` symlinks to it).
-- `skills/`: [tstack](https://github.com/t3dotgg/tstack) at `11e37a7` (MIT, see `skills/LICENSE-tstack`), plus `delegate`.
+- `skills/`: [tstack](https://github.com/t3dotgg/tstack) at `11e37a7` (MIT, see `skills/LICENSE-tstack`), plus local skills. Keep the locally maintained `council` override when refreshing tstack.
 - `plugins/`: the `agent-settings` local marketplace for both tools. Holds [pstack](https://github.com/cursor/plugins/tree/93b916d4a1e806507e22f4716b352fa91f2b227e/pstack) 0.15.43 (MIT) and the plugins listed in `plugins/PROVENANCE.json`.
 - `hooks/`: edit-check hooks shared by both tools.
 - `claude/`: Claude Code settings, statusline, and rules.

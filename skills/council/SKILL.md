@@ -10,16 +10,44 @@ relevant checks. Give council the updated implementation; do not defer known
 fixes until reviews return. If the user wants to discard the implementation
 and explore new ideas, skip fixes to code being replaced.
 
-Bring in three delegates to help with the user's request, usually for review
-or feedback. Use one strong model from each of three different providers, at
-high reasoning effort. If the user's instructions name council members, use
-those. Otherwise pick the latest flagship model from each provider, for
-example Claude Opus, GPT Sol, and Gemini Pro.
+Bring in three delegates for review or feedback. Use any council members the user specifies. Otherwise, use the default roster below.
 
-In T3 Code, use `orchestrator_capabilities` to resolve the models, then
-`delegate_task` to start one delegate per model in parallel. Elsewhere, use
-the harness's subagent tools. If you cannot reach three providers, or a named
-member is unavailable, report it instead of substituting.
+- Claude Fable 5.2 at medium reasoning effort
+- GPT Astra 6.2 at medium reasoning effort
+- Muse Wonder Full
+
+If a member is unavailable, try these fallbacks in order.
+
+1. GPT Sol 6.2 at extra-high reasoning effort
+2. Claude Opus 5.5 at high reasoning effort
+3. GPT Terra 6.1 at extra-high reasoning effort
+
+After these fallbacks, consider other models the harness lets you select explicitly.
+
+Before launching anyone, resolve candidates against the harness's available
+models and reserve a distinct canonical model ID for each reviewer in one
+coordinator-owned roster. Aliases, reasoning settings, reviewer names and
+different prompts do not make the same model distinct. Select replacements
+from that roster centrally; delegates do not independently choose fallbacks.
+
+In T3 Code, use `orchestrator_capabilities` to resolve IDs and `delegate_task`
+to launch the reserved models in parallel. Elsewhere, use the harness's
+subagent tools with an explicit model selection for every reviewer. If model
+overrides require a fresh context, pass the task and evidence explicitly.
+Never fill a slot with an inherited, default or unknown model. Check returned
+model metadata against the reservation. When metadata is absent, use the
+explicit selection accepted by the tool, not the delegate's self-description.
+A reported substitution must pass the same uniqueness check before its review
+counts; an unknown identity cannot count as a distinct council member.
+
+Keep model reservations through retries and later rounds. A reviewer may reuse
+its own model, but another reviewer cannot take that model, even after failure
+or retirement. Replace a failed reviewer only with an unused, supported model;
+record the replacement separately and do not carry over its predecessor's scores.
+If distinct candidates run out, continue with fewer reviewers and report the
+shortfall. Do not duplicate a model to reach three members or a score target,
+and do not claim full-council approval while a required member is missing.
+Report actual model IDs, substitutions and unfilled slots with the results.
 
 Give each delegate the request and relevant context. For review or feedback,
 keep their work read-only. Collect their responses and summarize the useful
@@ -45,9 +73,9 @@ Rounds: 2
 
 | Delegate | Round 1 | Round 2 |
 | --- | --- | --- |
-| Claude Opus | 7/10 | 9/10 |
-| GPT Sol | 8/10 | 10/10 |
-| Gemini Pro | 7/10 | 9/10 |
+| Claude Fable 5.2 | 7/10 | 9/10 |
+| GPT Astra 6.2 | 8/10 | 10/10 |
+| Muse Wonder Full | 7/10 | 9/10 |
 ```
 
 If a delegate gives no score, write `no score`. Do not invent one.
