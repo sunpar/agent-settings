@@ -163,21 +163,6 @@ enabled = true
 [plugins."simplify@agent-settings"]
 enabled = true
 
-[plugins."claude-md-management@claude-plugins-official"]
-enabled = true
-
-[plugins."feature-dev@claude-plugins-official"]
-enabled = true
-
-[plugins."frontend-design@claude-plugins-official"]
-enabled = true
-
-[plugins."skill-creator@claude-plugins-official"]
-enabled = true
-
-[plugins."superpowers@claude-plugins-official"]
-enabled = true
-
 [plugins."intelligent-compact@claude-settings"]
 enabled = true
 
@@ -229,10 +214,6 @@ status_line = [ "model-with-reasoning", "context-used", "weekly-limit", "task-pr
 [marketplaces.claude-settings]
 source_type = "git"
 source = "https://github.com/fcakyon/claude-codex-settings.git"
-
-[marketplaces.claude-plugins-official]
-source_type = "git"
-source = "https://github.com/anthropics/claude-plugins-official.git"
 
 [marketplaces.openai-codex]
 source_type = "git"
