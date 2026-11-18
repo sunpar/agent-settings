@@ -1,139 +1,34 @@
 ---
 name: wrap-check
-description: Audit a Claude Code desktop session for loose ends, then either offer to archive it or lay out the remaining work as tasks to start here or in new sessions. Use for /wrap-check and whenever the user asks "anything left?", "are we done here?", "can I archive this?", "is it safe to close this session?", "what's still open?", or wants to wind a session down, even if they don't name the skill. Also use when the user points at another session and asks whether it's finished.
+description: Audit an agent session for unfinished work, unverified claims, or work that would be lost on close. Use when asked to run wrap-check, find loose ends, check whether this or another session is done, or decide if it is safe to close or archive.
 ---
 
-# Wrap Check
+# Check whether a session is ready to close
 
-Answer three questions about a session, in order: is anything left, and if
-not, can it be archived safely; if so, what can be started and where. This is
-an audit. Don't do the remaining work, and never archive without an explicit
-yes in chat.
+Audit the session and recommend what to do next. Keep the audit read-only: leave follow-ups, commits, pushes, merges, and new sessions for a separate request. A question about whether it is safe to archive is not authorization to archive.
 
-## Pick the target
+## Identify the target
 
-The target is this session unless the user names another one. For another
-session, find it with `mcp__ccd_session_mgmt__list_sessions`, read its
-history with `mcp__ccd_session_mgmt__list_events`, and run the repo checks in
-its folder or worktree (from `get_session`). If the user hands you a
-transcript file and a folder instead, audit those.
+Use the current session unless the user names another one or supplies a transcript. Use available session history and workspace metadata to match the target to its files, repository, or worktree. If the target is ambiguous, ask which one to audit. Never substitute your current workspace for another session’s.
 
-## Find what's left
+Use the host’s read-only session tools to fill gaps or refresh stale evidence. For Claude Desktop’s session tools and optional action cards, see [Claude Desktop](references/claude-desktop.md). If the host has no session tools, audit the available files and history and report in plain text.
 
-Work through every check. Each is cheap, and the one you skip is the one that
-loses work.
+## Check requests against evidence
 
-**Conversation.** Read the user's messages from the start, not just the
-last turn.
+- **Conversation:** Read the relevant history from the start. Track each request and later correction, promises, open questions, and pending tasks. Distinguish required work from ideas the user deferred or declined.
+- **Claims and deliverables:** Verify material completion claims against files, commits, test output, or the destination where the user expects the result. Check that the user can still reach deliverables stored in scratch space, an ephemeral workspace, or the chat. Use a named, inexpensive local check when it would resolve a material gap and has no consequential side effects. A contradiction is unfinished work; missing evidence is unverified.
+- **Local and remote state:** For Git work, run `git --no-optional-locks status --short --untracked-files=all`, `git stash list`, and `git worktree list --porcelain` in the target repository. Check commits with `git log` or `git show` and compare the branch with its upstream when configured. A missing upstream or a stale tracking ref tells you nothing conclusive about remote state. Confirm publication or integration when it matters. A merged review may account for a squash merge if it covers the local changes; a closed but unmerged review does not prove integration.
+- **Reviews and live work:** When relevant, check the actual review, checks, and approvals (on GitHub, use `gh pr view` or `gh pr checks`). An open review can be the intended deliverable; flag unresolved checks, feedback, conflicts, or approvals when they affect the requested outcome. Look for related jobs, scheduled runs, or linked sessions still working or waiting for input. Note who or what can move them forward.
+- **Closure risks:** Check what closing or archiving does in this host. Treat unique changes, commits, or deliverables as blockers when the action could discard them. Do the same for work that would be interrupted. If the consequences are unknown and could matter, leave archive safety unverified. A dirty shared workspace can be unrelated to task completion; flag it as a closure risk only if the action could affect it.
 
-- Each request: done, partly done, or dropped? Later corrections replace
-  earlier asks.
-- Promises made and not kept: "I'll do X next", "follow-up", "separate PR",
-  "later", "not verified", "couldn't test".
-- Pending or in-progress task-list items.
-- Questions the user asked that never got an answer, and questions the
-  assistant asked that the user never answered.
-- Session cards proposed but never started or dismissed.
+## Report the verdict
 
-**Claims.** The transcript is the session's own account of its work, and it
-can be wrong. Before counting a request as done, check each concrete claim
-against the repo: files "added" or "changed" appear in the commits
-(`git show --stat`), "committed" is in `git log`, "pushed" matches the
-upstream, a named test exists. Rerun a test the transcript says passed only
-when it's quick and named. A claim the repo contradicts is work left; one you
-can't check is "unverified", not done.
+Lead with one verdict: ready to close, work remains, waiting on someone, or unable to verify. State archive safety separately if it differs. Cite the evidence that decides the verdict: a path, check result, review state, or specific request. Skip checks that do not apply and name missing evidence that could change the answer.
 
-**Repo.** Run in the target's folder, read-only:
+Group open items by next action when it helps:
 
-- `git status --short`, `git stash list`
-- `git log @{u}..` for unpushed commits. No upstream means nothing is
-  pushed, unless the PR merged and the branch was deleted afterward.
-- `git worktree list` and `get_session` to see whether the session owns a
-  worktree. Archiving deletes that worktree by default, so uncommitted or
-  unpushed work there is lost on archive. Treat it as a blocker, not a nit.
+- **Continue here:** Work that needs the session’s context, files, or existing review. Name the next step.
+- **Hand off:** Work that can start from a short brief. Include the goal, relevant files or links, what done means, and any dependency that determines whether it can start now.
+- **Waiting:** Name the person or external event needed and what it will unblock.
 
-**PR.** `mcp__ccd_pr__get_status`, or `gh pr view --json
-state,mergeable,statusCheckRollup,reviewDecision,autoMergeRequest` without it.
-Open with failing or pending CI, requested changes, or conflicts means work
-is left. Merged or closed means that part is done.
-
-**Live work.** Running background shell tasks, Monitors, crons or scheduled
-wakeups this session created, and `list_sessions {"linked": true}` for side
-sessions still working or waiting on the user. A session with live work isn't
-done even when the code is, and the app refuses to archive it.
-
-**Deliverables.** Files the user needs that exist only in the scratchpad or
-`/tmp`. Archiving doesn't delete those, but nobody will find them again.
-
-## Report
-
-Lead with one verdict line, then only the evidence that supports it. Keep
-each item to a line: what's left and the proof (`3 files uncommitted in
-worktree`, `CI failing on lint`, `user asked for dark mode, never done`).
-
-### Done: safe to archive
-
-Every check came back clean. Say so in one line with the evidence (clean
-tree, pushed, PR merged, nothing running). Then call
-`mcp__ccd_turn__wrap_up` with the ask "Archive this session?" and buttons
-"Archive" and "Keep it".
-
-When the user says yes, write your last message first, then call
-`mcp__ccd_session_mgmt__archive_session` with `session_id: "self"` (or the
-target's id) and a short `reason`. The conversation ends when the call
-succeeds, so nothing after it is seen. If the result says the session wasn't
-archived (pinned, open on screen, side session still working), tell the user
-why.
-
-### Waiting on you
-
-Only the user can move it forward: a PR approval, a merge, a credential, an
-answer to an open question. List those. Offer no session cards for them. If
-nothing else is left, say the session can be archived once they're done.
-
-### Work left
-
-List every item, then sort each into one of two homes using the same test
-as the app's own session rules:
-
-- **Here.** It acts on what this session found or built, or it's a few tool
-  calls. A new session would have to rediscover everything. Examples:
-  committing and pushing, fixing the CI failure on this PR, answering the
-  open question.
-- **New session.** It's a task of its own that a short brief can carry: it
-  lands apart from this change, touches other files, or the user set it
-  aside earlier. Examples: an unrelated bug noticed in passing, a refactor
-  promised as a separate PR, docs for another package.
-
-For "here" items, put the most important one in `wrap_up` as the ask with a
-button that does it ("Commit and push", "Fix CI"), plus "Not now". If there
-are several, name the rest in the closing message so the user can pick.
-
-For each "new session" item, call `mcp__ccd_session__start_session` with
-`initiation: "own_initiative"`, at most three per turn. Prefer
-`context: "fresh"` and write a complete brief: `prompt` with the task, files,
-and what done looks like; `background` (80+ characters) with the goal and
-decisions so far. Write it for someone who never saw this conversation. Use
-`"fork"` only when the task leans on this conversation and it is still short.
-These are cards: nothing runs until the user clicks one.
-
-If items in both homes exist, say which "here" work has to land before the
-session can be archived, and whether new-session cards can start now or must
-wait for it.
-
-## Example
-
-> **Not done: 1 blocker, 2 follow-ups.**
->
-> Here
->
-> - Worktree has 2 uncommitted files (`api/auth.ts`, `api/auth.test.ts`).
->   Archiving now would delete them.
->
-> New session (cards below)
->
-> - Flaky `checkout.spec.ts` you noticed at 14:02, unrelated to auth.
-> - README for the new `/v2/token` endpoint, promised as a separate PR.
-
-`wrap_up` ask: "Commit and push the auth changes?" with "Commit and push" and
-"Not now".
+If the session is ready and archiving is useful, offer to archive it. Use a supported host action only with explicit authorization for that session, and recheck any state that could have changed before acting. With no archive tool, report whether the user can close or archive it themselves. Never substitute deletion for archiving.
