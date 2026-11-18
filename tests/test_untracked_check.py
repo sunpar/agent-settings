@@ -82,21 +82,52 @@ def test_lists_each_new_path_once(home: Path, repo: Path) -> None:
     assert stop(home, repo)[1:-1] == ["  later.txt"]
 
 
-def test_lists_paths_past_the_cap_at_a_later_stop(home: Path, repo: Path) -> None:
+def test_lists_every_path_before_the_active_follow_up(home: Path, repo: Path) -> None:
     start(home, repo)
     for n in range(25):
         touch(repo / f"f{n:02}.txt")
-    lines = stop(home, repo)[1:-1]
-    assert lines[0] == "  f00.txt"
-    assert lines[19] == "  f19.txt"
-    assert lines[20:] == ["  ...and 5 more, listed at a later stop"]
+    touch(repo / "ignored.log")
+    assert stop(home, repo)[1:-1] == [f"  f{n:02}.txt" for n in range(25)]
+    assert stop(home, repo, active=True) is None
+    assert stop(home, repo) is None
+
+
+def test_lists_a_path_once_per_git_root(home: Path, repo: Path) -> None:
+    other_repo = repo.parent / "other"
+    subprocess.run(["git", "init", "-q", str(other_repo)], check=True)
+    start(home, repo)
+    touch(repo / "notes.txt")
+    touch(other_repo / "notes.txt")
+    assert stop(home, repo)[1:-1] == ["  notes.txt"]
+    assert stop(home, other_repo)[1:-1] == ["  notes.txt"]
+    assert stop(home, repo) is None
+    assert stop(home, other_repo) is None
+
+
+def test_keeps_carriage_return_and_newline_paths_distinct(
+    home: Path, repo: Path
+) -> None:
+    start(home, repo)
+    touch(repo / "line\nbreak.txt")
+    touch(repo / "line\rbreak.txt")
     assert stop(home, repo)[1:-1] == [
-        "  f20.txt",
-        "  f21.txt",
-        "  f22.txt",
-        "  f23.txt",
-        "  f24.txt",
+        "  'line\\nbreak.txt'",
+        "  'line\\rbreak.txt'",
     ]
+    assert stop(home, repo) is None
+
+
+def test_legacy_history_keeps_the_session_start(home: Path, repo: Path) -> None:
+    old = touch(repo / "old.txt")
+    age(old)
+    state = home / ".cache" / "agent-hooks" / "untracked" / "s1.json"
+    state.parent.mkdir(parents=True)
+    state.write_text(
+        json.dumps({"start": old.stat().st_mtime + 1, "listed": ["same.txt"]})
+    )
+    touch(repo / "same.txt")
+    assert stop(home, repo)[1:-1] == ["  same.txt"]
+    assert stop(home, repo) is None
 
 
 def test_skips_files_from_before_the_session(home: Path, repo: Path) -> None:
