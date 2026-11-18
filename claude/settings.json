@@ -118,7 +118,7 @@
     "feature-dev@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": false,
-    "fable-advisor@claude-settings": false,
+    "fable-advisor@claude-settings": true,
     "pstack@agent-settings": true
   },
   "extraKnownMarketplaces": {
