@@ -46,7 +46,8 @@ one appears.
    smallest change that works. Fix the case that happened, not every case
    that could. If you are on the default branch, create a branch first.
 2. **Prove it.** Get proof for every change you made. See "Proof".
-3. **Get feedback.** Use the `sol-loop` skill to verify changes.
+3. **Review the change.** Get [independent approval](#independent-code-review),
+   then run the `sol-loop` skill for a separate review with GPT Sol 6.2.
 4. **File the PR** with the `file-pr` skill. Rebase onto the latest default
    branch first. Add one short line to the description that says how you proved
    the change.
@@ -79,11 +80,40 @@ reproduction, a screenshot. Use the most direct proof the change allows:
 When you cannot find a way to prove a change, you do not have full confidence.
 Ask the user.
 
+## Independent code review
+
+Choose a reviewer from a different model family than the models that wrote the
+PR diff, including any implementation delegates. Select by authorship of the
+change even when a different session is handling the merge.
+
+| Code written by | First reviewer | Fallback if unavailable |
+| --- | --- | --- |
+| GPT | Muse Wonder Full | Claude Opus 5.5 |
+| Claude | Muse Wonder Full | GPT Sol 6.2 at `xhigh` |
+
+- **Muse Wonder Full.** Use the `delegate` skill with `--runtime muse --model muse-wonder-full-1.0 --permissions read-only`.
+- **Claude Opus 5.5.** Use the `delegate` skill with `--runtime claude --model claude-opus-5-5 --permissions read-only`.
+- **GPT Sol 6.2 at `xhigh`.** Use a read-only Codex review session with `codex exec --model gpt-6.2-sol --sandbox read-only -c model_reasoning_effort=xhigh`. Pass the brief on stdin.
+
+Give the reviewer the diff, the intended behavior, and the checks already run.
+Include the patch in the brief so Muse can review it with shell access disabled.
+Ask for findings with file and line references and an `APPROVE` or `CHANGES`
+verdict. The reviewer returns feedback only. Handle fixes in the parent session.
+
+Use a fallback only when the first reviewer cannot complete the review. For
+mixed or uncertain authorship, use a listed reviewer only if you can establish
+that its family did not contribute to the diff. If no eligible reviewer is
+available, ask the user to choose one from another family. Fix or resolve
+substantive findings and get approval for the current diff. If the diff changes
+after approval, including during `sol-loop` or PR monitoring, renew independent
+approval before the next `sol-loop` review of the changed diff.
+
 ## Merge gate
 
 Full confidence means all of these are true on the latest commit:
 
 - Your proof covers every change in the diff.
+- The independent reviewer and `sol-loop` both approved the current diff, in that order.
 - Required checks are green.
 - Review bots have finished, and each finding is fixed or dismissed with a
   written reason.

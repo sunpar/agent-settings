@@ -14,8 +14,8 @@ in its own session, by default on an isolated git worktree, and its result comes
 concurrency issues` or `/delegate claude-opus Implement the new API endpoints and run the tests`.
 
 - **Runtime**: `claude`, `codex`, `opencode`, or `muse`. A suffix names a model: `claude-opus` means runtime `claude`,
-  `--model opus`. Muse model ids keep their prefix: `muse-spark-1.3` means `--runtime muse --model
-  muse-spark-1.3`. If no runtime is named or you don't recognize it, run `agentctl runtimes` and pick an
+  `--model opus`. Muse model IDs keep their prefix: `muse-wonder-full-1.0` means `--runtime muse --model
+  muse-wonder-full-1.0`. If no runtime is named or you don't recognize it, run `agentctl runtimes` and pick an
   installed one, or ask.
 - **Permissions**: `workspace-write` by default. Use `read-only` for reviews and investigations that should not
   change code. Use `full` only when the user asks for it.

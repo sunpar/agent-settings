@@ -21,8 +21,9 @@
     {
       "name": "pstack",
       "source": {
-        "source": "local",
-        "path": "./pstack"
+        "source": "url",
+        "url": "https://github.com/backnotprop/pstack.git",
+        "sha": "0d2dc00df47d7686c94324cfe9c3444710d9f16d"
       },
       "policy": {
         "installation": "AVAILABLE",

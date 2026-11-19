@@ -11,7 +11,11 @@
     },
     {
       "name": "pstack",
-      "source": "./pstack",
+      "source": {
+        "source": "github",
+        "repo": "backnotprop/pstack",
+        "sha": "0d2dc00df47d7686c94324cfe9c3444710d9f16d"
+      },
       "description": "if you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence."
     },
     {

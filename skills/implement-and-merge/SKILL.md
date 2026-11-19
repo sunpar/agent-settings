@@ -1,0 +1,16 @@
+---
+name: implement-and-merge
+description: Use when the user asks to implement and merge a GitHub issue or work through a GitHub epic with concurrent delivery sessions.
+---
+
+# Implement and merge
+
+Apply this workflow when the user authorizes delivery through merge. For an epic, follow [Epic delivery](references/epic.md) and give each ticket owner the single-issue workflow below.
+
+For one issue, the same session owns implementation, PR, review, final local CI, and merge.
+
+1. **Implement the ticket.** Use `mattpocock-skills:implement`. If the skill loader cannot invoke it, read `skills/engineering/implement/SKILL.md` in the installed `mattpocock-skills` package. Fetch the issue with `gh`, state its title, and verify scope and prerequisites. Develop on a topic branch. Use focused regression tests, typechecking, lint, and direct runtime proof as relevant. Review and commit as `implement` directs.
+2. **Review and open the PR.** Use `full-send` for the rest of delivery. Read its [installed instructions](../full-send/SKILL.md) if the loader cannot invoke it. Finish local review, fetch and rebase, then open the PR or continue its existing PR. The PR owner verifies review fixes with focused checks. Before local CI, check the exact head’s reviews and other required statuses directly. Use bounded change waits and recheck on wake or timeout. Give `pr-wait --until any-change` an external deadline that stops the watcher because it can omit remote success events while the local status is missing. Wait for all-green after local CI passes.
+3. **Run local CI immediately before merge.** Both skills’ full-suite and local CI proof belong here. Start after integration, review, rebases, pushes, and all other merge prerequisites are settled. Fetch the base again and verify the clean local checkout and remote PR head agree on the exact commit. Run the repository’s required command with full coverage once per candidate by default. Use the recovery rule below for a timeout.
+4. **Keep each local CI invocation under five minutes of wall time.** Budget from command launch through setup, tests, cleanup, and status posting. Use the repository’s supported sharding, parallelism, and caches where compatible with the required gate. Enforce the deadline with a supervisor that stops the runner and its test subprocesses, including separate process groups when the runner creates them. Leave time for termination within the same budget. Verify that coverage on a short harmless process tree if the supervisor’s behavior is uncertain. If the gate times out, use the timing output for a scoped recovery that preserves coverage and retry only when it addresses the blocker. Leave the PR open and report the blocker if the required gate still cannot pass within the limit.
+5. **Merge the verified head.** Recheck GitHub’s review and required checks, mergeability, head, and latest base. A fix, rebase, or base movement that requires a rebase returns to the review and final gate steps for the resulting head. Merge through the configured protections, pinning the tested head where supported. Verify GitHub reports the PR merged. Report the PR, merge commit, proof, and measured local CI wall time, or the remaining blocker.
