@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implement and Merge"
+  short_description: "Ship GitHub issues or epics with timed final CI"
+  default_prompt: "Use $implement-and-merge to implement this GitHub issue or epic and merge the resulting pull requests."

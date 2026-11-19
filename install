@@ -317,6 +317,26 @@ def apply(changes: list[Change], backup_root: Path) -> None:
         write(change)
 
 
+def refresh_claude_pstack(claude: str) -> None:
+    """Install or refresh the pinned pstack mirror in Claude Code."""
+    env = {**os.environ, "CLAUDE_CONFIG_DIR": str(HOME / ".claude")}
+    listing = subprocess.run(
+        [claude, "plugin", "list", "--json"], env=env, check=True,
+        stdout=subprocess.PIPE, text=True,
+    )
+    if any(
+        entry["id"] == "pstack@agent-settings" and entry["scope"] == "user"
+        for entry in json.loads(listing.stdout)
+    ):
+        command = [claude, "plugin", "update", "pstack@agent-settings", "--scope", "user"]
+    else:
+        command = [
+            claude, "plugin", "install", "pstack",
+            "--marketplace", str(REPO / "plugins"), "--scope", "user",
+        ]
+    subprocess.run(command, env=env, check=True)
+
+
 def refresh_codex_plugins(codex: str) -> None:
     """Materialize configured packages through Codex without enabling disabled plugins."""
     profile = tomlkit.parse(render("codex/config.toml"))
@@ -385,6 +405,8 @@ def main() -> None:
             apply(changes, backup_root)
             if backup_root.exists():
                 print(f"backups in {tilde(backup_root)}")
+        if "claude" in harnesses and (claude := shutil.which("claude")):
+            refresh_claude_pstack(claude)
         if "codex" in harnesses and (codex := shutil.which("codex")):
             refresh_codex_plugins(codex)
     if not changes:

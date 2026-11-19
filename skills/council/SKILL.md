@@ -14,7 +14,7 @@ Bring in three delegates for review or feedback. Use any council members the use
 
 - Claude Fable 5.2 at medium reasoning effort
 - GPT Astra 6.2 at medium reasoning effort
-- Muse Wonder Full
+- Muse Wonder Full (`muse-wonder-full-1.0`)
 
 If a member is unavailable, try these fallbacks in order.
 
