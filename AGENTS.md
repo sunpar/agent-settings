@@ -19,13 +19,14 @@ Where instructions differ, follow the user's request first, then the project's i
 - Before finishing, check each requirement in the request against the diff and `git status`, and name any you did not meet.
 - In docs and reports, every claim names the command that measured it. Prefer editing existing files; never create docs (*.md, README) unless asked.
 - Write commit messages and replies for someone who hasn't seen your working: define any internal name, number or path you mention, and say what it means for the user.
-- Seek a second opinion before committing to an approach on a non-trivial change and after two failed attempts at the same problem. Start with `codex-advisor` (GPT-6.2 Astra, medium) in Claude Code and `fable-advisor` (Claude Fable 5.2, medium) in Codex. If either advisor reports a provider spend limit, the requesting session automatically tries the other advisor once. If both report spend limits, proceed with already authorized code reviews as soon as their prerequisites are met and report both limits in the final review summary. Advisors return their own result to the requesting session.
 - Use the `writing-guidelines` skill to review documentation or interface copy.
 - Use the `anthropic-frontend-design` or `openai-frontend-design` skill when creating or reshaping a UI.
 
 ## GitHub
 
 Use `gh` CLI for all GitHub interactions. Never clone repositories to read code.
+
+Use the [`full-send` skill](skills/full-send/SKILL.md) when asked to merge a PR, unless explicitly instructed otherwise. The merge request counts as explicit invocation of the skill.
 
 ## Python Coding
 
