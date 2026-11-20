@@ -46,7 +46,7 @@ one appears.
    smallest change that works. Fix the case that happened, not every case
    that could. If you are on the default branch, create a branch first.
 2. **Prove it.** Get proof for every change you made. See "Proof".
-3. **Review the change.** Get [independent approval](#independent-code-review),
+3. **Review the change.** Follow the [independent review sequence](#independent-code-review),
    then run the `sol-loop` skill with GPT Sol 6.2 Hard.
 4. **File the PR** with the `file-pr` skill. Rebase onto the latest default
    branch first. Add one short line to the description that says how you proved
@@ -82,14 +82,13 @@ Ask the user.
 
 ## Independent code review
 
-Choose a reviewer from a different model family than the models that wrote the
-PR diff, including any implementation delegates. Select by authorship of the
-change even when a different session is handling the merge.
+Choose the review order by who wrote the PR diff, including implementation
+delegates, even when a different session handles the merge.
 
-| Code written by | First reviewer | Fallback if unavailable |
-| --- | --- | --- |
-| GPT | Muse Wonder Full | Claude Opus 5.5 at `high` |
-| Claude | Muse Wonder Full | GPT‑6.2 Astra at `high` |
+| Code written by | First choice | Second choice | Third choice |
+| --- | --- | --- | --- |
+| GPT | Muse Wonder Full | Claude Opus 5.5 at `high` | GPT‑6.2 Astra at `high` |
+| Claude | Muse Wonder Full | GPT‑6.2 Astra at `high` | Claude Opus 5.5 at `high` |
 
 - **Muse Wonder Full.** Use the `delegate` skill with `--runtime muse --model muse-wonder-full-1.0 --permissions read-only`.
 - **Claude Opus 5.5 at `high`.** Pass the brief on stdin to `claude -p --model claude-opus-5-5 --effort high --tools Read,Grep,Glob --strict-mcp-config`.
@@ -100,20 +99,22 @@ Include the patch in the brief so Muse can review it with shell access disabled.
 Ask for findings with file and line references and an `APPROVE` or `CHANGES`
 verdict. The reviewer returns feedback only. Handle fixes in the parent session.
 
-Use a fallback only when the first reviewer cannot complete the review. For
-mixed or uncertain authorship, use a listed reviewer only if you can establish
+Try the reviewers in order. Move to the next choice only when the current
+reviewer cannot complete the review. Resolve substantive findings and get approval
+before starting `sol-loop`. If none of the three choices in the applicable row can
+complete the review, record the failed attempts and proceed to `sol-loop`.
+
+For mixed or uncertain authorship, use a listed reviewer only if you can establish
 that its family did not contribute to the diff. If no eligible reviewer is
-available, ask the user to choose one from another family. Fix or resolve
-substantive findings and get independent approval before the first `sol-loop`
-round. After that approval, send revisions from Sol or PR monitoring through
-`sol-loop` under its usual rules.
+available, ask the user to choose one from another family. Send revisions from Sol
+or PR monitoring through `sol-loop` under its usual rules.
 
 ## Merge gate
 
 Full confidence means all of these are true on the latest commit:
 
 - Your proof covers every change in the diff.
-- Independent approval preceded the first `sol-loop` round, and Sol approved the current diff.
+- Independent approval or the documented exception preceded `sol-loop`, and Sol approved the current diff.
 - Required checks are green.
 - Review bots have finished, and each finding is fixed or dismissed with a
   written reason.
