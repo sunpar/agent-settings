@@ -47,7 +47,7 @@ one appears.
    that could. If you are on the default branch, create a branch first.
 2. **Prove it.** Get proof for every change you made. See "Proof".
 3. **Review the change.** Follow the [independent review sequence](#independent-code-review),
-   then run the `sol-loop` skill with GPT Sol 6.2 Hard.
+   then run the `sol-loop` skill with `gpt-6.2-sol` at `high` reasoning effort.
 4. **File the PR** with the `file-pr` skill. Rebase onto the latest default
    branch first. Add one short line to the description that says how you proved
    the change.
@@ -57,11 +57,10 @@ one appears.
 7. **Report** in your final message: the PR link, the merge commit, your proof,
    and each decision you made for the user.
 
-Stay active from step 1 to step 7. If you end your turn while checks or bots are
-pending, the work stops, because nobody will prompt you again. Wait with the
-watcher from `babysit-pr`, so something wakes you when the PR changes. In T3
-Code that is `watch_pull_request`. If you stop before the merge, call
-`unwatch_pull_request` first.
+Use the watcher from `babysit-pr` until the merge. In T3 Code, register
+`watch_pull_request` before ending a turn to wait, and resume when it wakes you.
+Call `unwatch_pull_request` before handing off. Outside T3 Code, keep the turn
+active and continue waiting after informational events.
 
 ## Proof
 
@@ -82,42 +81,38 @@ Ask the user.
 
 ## Independent code review
 
-Choose the review order by who wrote the PR diff, including implementation
-delegates, even when a different session handles the merge.
+Try the reviewers in the row for the model running this session.
 
-| Code written by | First choice | Second choice | Third choice |
-| --- | --- | --- | --- |
-| GPT | Muse Wonder Full | Claude Opus 5.5 at `high` | GPT‑6.2 Astra at `high` |
-| Claude | Muse Wonder Full | GPT‑6.2 Astra at `high` | Claude Opus 5.5 at `high` |
+| Session model | Reviewers in order |
+| --- | --- |
+| Claude | GPT-6.2 Astra (`medium`), Claude Fable 5.2 (`medium`) |
+| Otherwise | Muse Wonder Full, Claude Opus 5.5 (`high`), GPT-6.2 Astra (`medium`) |
 
 - **Muse Wonder Full.** Use the `delegate` skill with `--runtime muse --model muse-wonder-full-1.0 --permissions read-only`.
-- **Claude Opus 5.5 at `high`.** Pass the brief on stdin to `claude -p --model claude-opus-5-5 --effort high --tools Read,Grep,Glob --strict-mcp-config`.
-- **GPT‑6.2 Astra at `high`.** Pass the brief on stdin to `codex exec --model gpt-6.2-astra --sandbox read-only -c model_reasoning_effort=high -`.
+- **Claude Opus 5.5.** Pass the brief on stdin to `claude -p --model claude-opus-5-5 --effort high --tools Read,Grep,Glob --strict-mcp-config`.
+- **GPT-6.2 Astra.** Pass the brief on stdin to `codex exec --model gpt-6.2-astra --sandbox read-only -c model_reasoning_effort=medium -`.
+- **Claude Fable 5.2.** Pass the brief on stdin to `claude -p --model claude-fable-5-2 --effort medium --tools Read,Grep,Glob --strict-mcp-config`.
 
 Give the reviewer the diff, the intended behavior, and the checks already run.
 Include the patch in the brief so Muse can review it with shell access disabled.
-Ask for findings with file and line references and an `APPROVE` or `CHANGES`
-verdict. The reviewer returns feedback only. Handle fixes in the parent session.
+Ask for a read-only review with file and line references for each finding.
 
-Try the reviewers in order. Move to the next choice only when the current
-reviewer cannot complete the review. Resolve substantive findings and get approval
-before starting `sol-loop`. If none of the three choices in the applicable row can
-complete the review, record the failed attempts and proceed to `sol-loop`.
-
-For mixed or uncertain authorship, use a listed reviewer only if you can establish
-that its family did not contribute to the diff. If no eligible reviewer is
-available, ask the user to choose one from another family. Send revisions from Sol
-or PR monitoring through `sol-loop` under its usual rules.
+Try each listed model once. Stop at the first completed review, even if it
+requests changes.
+Resolve substantive findings in the parent session, then start `sol-loop` on the
+resulting diff. If none of the listed models completes a review,
+record why, skip independent review, and start `sol-loop`.
+Send revisions from Sol or PR monitoring through `sol-loop` under its usual rules.
 
 ## Merge gate
 
 Full confidence means all of these are true on the latest commit:
 
 - Your proof covers every change in the diff.
-- Independent approval or the documented exception preceded `sol-loop`, and Sol approved the current diff.
+- Sol approved the current diff.
 - Required checks are green.
-- Review bots have finished, and each finding is fixed or dismissed with a
-  written reason.
+- Review bots that gate readiness under `babysit-pr` have finished. Each finding
+  received is fixed or dismissed with a written reason.
 - No human review still requests changes.
 - The branch is up to date with the default branch, and GitHub reports it as
   mergeable.
