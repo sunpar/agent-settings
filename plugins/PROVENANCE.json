@@ -1,5 +1,11 @@
 {
   "anthropic-essentials": "/Users/sunpar/.claude/plugins/cache/claude-settings/anthropic-essentials/1.0.0",
+  "codex-advisor": {
+    "upstream": "fcakyon/claude-codex-settings/plugins/codex-advisor",
+    "commit": "7a519d87d5578a1515e0abc70fe43d303a782c94",
+    "version": "1.2.0",
+    "localChange": "Pin gpt-6.2-astra, and run codex exec without --ephemeral so Codex saves each review and token_usage can count it."
+  },
   "components": [
     "feature-dev",
     "claude-md-management",

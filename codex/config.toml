@@ -127,7 +127,7 @@ enabled = true
 [plugins."data-analytics@openai-curated-remote"]
 enabled = true
 
-[plugins."codex-advisor@claude-settings"]
+[plugins."codex-advisor@agent-settings"]
 enabled = true
 
 [plugins."python-skills@claude-settings"]

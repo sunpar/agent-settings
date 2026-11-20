@@ -5,6 +5,11 @@
   },
   "plugins": [
     {
+      "name": "codex-advisor",
+      "source": "./codex-advisor",
+      "description": "Get a second opinion from GPT-6.2 Astra via the Codex CLI before big decisions."
+    },
+    {
       "name": "phd-skills",
       "source": "./phd-skills",
       "description": "Catch AI mistakes before they cost weeks of compute. Reproduce papers from arxiv. Debug runs evidence-first. Compare experiments at the right epoch. Launch with discipline."
