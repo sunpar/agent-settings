@@ -110,6 +110,7 @@ REGISTRY: dict[Harness, tuple[Op, ...]] = {
                         "CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING",
                         "CLAUDE_CODE_NO_FLICKER",
                         "ENABLE_PROMPT_CACHING_1H",
+                        "FORCE_PROMPT_CACHING_5M",
                         "SLASH_COMMAND_TOOL_CHAR_BUDGET",
                     )
                 ),
