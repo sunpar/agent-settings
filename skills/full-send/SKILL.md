@@ -47,7 +47,7 @@ one appears.
    that could. If you are on the default branch, create a branch first.
 2. **Prove it.** Get proof for every change you made. See "Proof".
 3. **Review the change.** Get [independent approval](#independent-code-review),
-   then run the `sol-loop` skill for a separate review with GPT Sol 6.2.
+   then run the `sol-loop` skill with GPT Sol 6.2 Hard.
 4. **File the PR** with the `file-pr` skill. Rebase onto the latest default
    branch first. Add one short line to the description that says how you proved
    the change.
@@ -104,16 +104,16 @@ Use a fallback only when the first reviewer cannot complete the review. For
 mixed or uncertain authorship, use a listed reviewer only if you can establish
 that its family did not contribute to the diff. If no eligible reviewer is
 available, ask the user to choose one from another family. Fix or resolve
-substantive findings and get approval for the current diff. If the diff changes
-after approval, including during `sol-loop` or PR monitoring, renew independent
-approval before the next `sol-loop` review of the changed diff.
+substantive findings and get independent approval before the first `sol-loop`
+round. After that approval, send revisions from Sol or PR monitoring through
+`sol-loop` under its usual rules.
 
 ## Merge gate
 
 Full confidence means all of these are true on the latest commit:
 
 - Your proof covers every change in the diff.
-- The independent reviewer and `sol-loop` both approved the current diff, in that order.
+- Independent approval preceded the first `sol-loop` round, and Sol approved the current diff.
 - Required checks are green.
 - Review bots have finished, and each finding is fixed or dismissed with a
   written reason.
