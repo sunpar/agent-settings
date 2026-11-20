@@ -1,0 +1,5 @@
+{
+  "name": "codex-advisor",
+  "version": "1.2.0",
+  "description": "Get a second opinion from GPT-6.2 Astra via Codex CLI before big decisions."
+}

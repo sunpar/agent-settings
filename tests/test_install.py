@@ -15,6 +15,7 @@ RETIRED_CODEX_PLUGINS = (
     "bio-research@claude-cowork",
     "claude-md-management@claude-plugins-official",
     "claude-tools@claude-settings",
+    "codex-advisor@claude-settings",
     "codex@openai-codex",
     "cowork-plugin-management@claude-cowork",
     "desktop-commander@claude-cowork",
@@ -122,6 +123,7 @@ def home(tmp_path: Path) -> Path:
                 },
                 "enabledPlugins": {
                     "pstack@cursor-plugins": True,
+                    "codex-advisor@claude-settings": True,
                     "mine@elsewhere": True,
                 },
                 "extraKnownMarketplaces": {
@@ -185,6 +187,8 @@ def test_claude_settings_merge(home: Path) -> None:
     assert settings["enabledPlugins"]["mine@elsewhere"] is True
     assert settings["enabledPlugins"]["pstack@agent-settings"] is True
     assert "pstack@cursor-plugins" not in settings["enabledPlugins"]
+    assert "codex-advisor@claude-settings" not in settings["enabledPlugins"]
+    assert settings["enabledPlugins"]["codex-advisor@agent-settings"] is True
     assert "cursor-plugins" not in settings["extraKnownMarketplaces"]
     assert (
         settings["extraKnownMarketplaces"]["agent-settings"]["source"]["path"]
@@ -216,6 +220,7 @@ def test_codex_config_merge(home: Path) -> None:
     assert config["model"] != "old-model"
     assert "pstack@cursor-plugins" not in config["plugins"]
     assert set(RETIRED_CODEX_PLUGINS).isdisjoint(config["plugins"])
+    assert config["plugins"]["codex-advisor@agent-settings"] == {"enabled": True}
     for name in DISABLED_CODEX_PLUGINS:
         assert config["plugins"][name]["enabled"] is False
     assert config["plugins"]["pstack@agent-settings"] == {"enabled": True}

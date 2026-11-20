@@ -104,7 +104,7 @@
     "frontend-design@claude-plugins-official": false,
     "superpowers@claude-plugins-official": false,
     "codex@openai-codex": true,
-    "codex-advisor@claude-settings": true,
+    "codex-advisor@agent-settings": true,
     "python-skills@claude-settings": true,
     "react-skills@claude-settings": false,
     "agent-browser@claude-settings": false,
