@@ -45,19 +45,22 @@ missing or pre-failing checks in the brief.
 
 ## 2. Start Sol
 
-Use GPT Sol 6.2 for every round and leave reasoning effort at the runtime's
-default. Record the provider, model, and effort when exposed.
+Use GPT Sol 6.2 Hard for every round. Select the explicit Hard preset where
+available. In Codex, use `gpt-6.2-sol` with `high` reasoning effort.
+Record the provider, model, and effort when exposed.
 
-In T3, call `orchestrator_capabilities` to resolve the ID for GPT Sol 6.2.
+In T3, call `orchestrator_capabilities` to resolve the GPT Sol 6.2 Hard
+preset or its model and effort settings.
 Use `delegate_task` every round (`role: "review"`,
 `mode: "async"`). Save `taskId`. New `clientRequestId` per round.
 `childThreadId` is storage, not the next target. Do not use
 `t3_thread_send`, `create_threads`, or `t3_thread_launch` for review.
 
 If T3 tools are not listed, try one direct capability call. Outside T3, use
-a native subagent with `gpt-6.2-sol` and keep its ID. In Claude Code, use a
-custom subagent configured for GPT Sol 6.2. If no route runs that version,
-report the blocker.
+a native subagent with `gpt-6.2-sol` and `high` reasoning effort and keep
+its ID. In Claude Code, use a custom subagent configured for the same preset or
+run Codex with `-m gpt-6.2-sol -c model_reasoning_effort=high`. If no route
+supports the preset, report the blocker.
 
 Do not edit scoped files while review runs. Wait for the notice. Do not
 poll or start a second reviewer. Timeout, error, or no reply is not
