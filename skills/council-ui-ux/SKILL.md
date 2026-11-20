@@ -5,15 +5,19 @@ description: Review an app's UI and UX with screenshots and independent council 
 
 # Council UI/UX
 
-Run the app, capture its main screens and important states, and have each council member independently identify specific design issues and score the experience from 1 to 10. For review requests, finish after reporting the screenshots, findings, scores, and recommended changes. When the user asks for improvements, implement them and repeat the review until **every member scores the current design at least 9/10**, unless the user sets a different target.
+Run the app, capture its main screens and important states, and have each council member independently identify specific design issues and score the experience from 1 to 10.
+
+For review-only requests, keep the app and PR read-only. Report the screenshots, findings, scores, and recommendations in chat, even if a PR is open. Stop after reporting.
+
+When the user asks for improvements, implement them and repeat the review until **every required reviewer scores the current design at least 9/10**, unless the user sets a different target.
 
 Focus on clarity, visual hierarchy, typography, spacing, consistency, and ease of use. Preserve existing functionality.
 
 ## Set up the review
 
-Read the installed [council skill](../council/SKILL.md) for reviewer selection, explicit model identities, delegation, and result reporting. If council is unavailable, report the missing dependency.
+Read the installed [council skill](../council/SKILL.md) for reviewer selection, model identities, fallbacks, and delegation. Follow this skill for review scope, edits, scoring, reporting, and when to stop. If council is unavailable, report the missing dependency.
 
-Keep the same distinct models across rounds. Report the actual scores and model identities. Every required member must score the current design for the score gate to pass.
+Keep reviewers across rounds while they are available. Replace an unavailable reviewer with an eligible unused model from the council fallback order. The replacement counts toward the target once it independently scores the current screenshots. Record that score under the replacement's model identity.
 
 Inspect the app's run instructions and working-tree state. Keep requested edits isolated from unrelated changes. Choose a screen/state inventory that covers the app's primary tasks, relevant loading/empty/error states, and the interactions the design depends on. Include desktop and mobile where supported.
 
@@ -42,13 +46,13 @@ Consolidate findings against the captured evidence. Reproduce material findings 
 
 Exercise changed interactions in the browser or native app, including keyboard and touch paths where relevant. Screenshots do not prove navigation, focus, validation, loading behavior, or successful application of changes. Run the project's relevant checks during iteration and final checks before completion.
 
-Capture fresh screenshots after each implementation pass and request a new independent review from the same members. Include changed screens, important states, and enough unchanged context to detect regressions. Never present old screenshots or old scores as evidence for a newer design.
+Capture fresh screenshots after each implementation pass and request a new independent review from the current roster. Include changed screens, important states, and enough unchanged context to detect regressions. Never present old screenshots or old scores as evidence for a newer design.
 
 ## Continue until the gate passes
 
 Continue implementing and reviewing until all required members score the same current design at or above the target and material functionality regressions are resolved. Do not stop just because most reviewers pass or a preset number of rounds has elapsed.
 
-If a member remains below the target, request concrete remaining issues rather than a higher score. If progress stalls, re-examine the design approach instead of accumulating cosmetic changes. If a reviewer or required validation is unavailable, preserve the work and report exactly what prevents completion; do not claim the target was met. Honor a user instruction to stop or change scope.
+If a member remains below the target, request concrete remaining issues rather than a higher score. If progress stalls, re-examine the design approach instead of accumulating cosmetic changes. If a required review remains unfilled after fallbacks or required validation is unavailable, preserve the work and report why the target remains unmet. Honor a user instruction to stop or change scope.
 
 ## Ship on explicit request
 
