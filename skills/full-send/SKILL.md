@@ -88,12 +88,12 @@ change even when a different session is handling the merge.
 
 | Code written by | First reviewer | Fallback if unavailable |
 | --- | --- | --- |
-| GPT | Muse Wonder Full | Claude Opus 5.5 |
-| Claude | Muse Wonder Full | GPT Sol 6.2 at `xhigh` |
+| GPT | Muse Wonder Full | Claude Opus 5.5 at `high` |
+| Claude | Muse Wonder Full | GPT‑6.2 Astra at `high` |
 
 - **Muse Wonder Full.** Use the `delegate` skill with `--runtime muse --model muse-wonder-full-1.0 --permissions read-only`.
-- **Claude Opus 5.5.** Use the `delegate` skill with `--runtime claude --model claude-opus-5-5 --permissions read-only`.
-- **GPT Sol 6.2 at `xhigh`.** Use a read-only Codex review session with `codex exec --model gpt-6.2-sol --sandbox read-only -c model_reasoning_effort=xhigh`. Pass the brief on stdin.
+- **Claude Opus 5.5 at `high`.** Pass the brief on stdin to `claude -p --model claude-opus-5-5 --effort high --tools Read,Grep,Glob --strict-mcp-config`.
+- **GPT‑6.2 Astra at `high`.** Pass the brief on stdin to `codex exec --model gpt-6.2-astra --sandbox read-only -c model_reasoning_effort=high -`.
 
 Give the reviewer the diff, the intended behavior, and the checks already run.
 Include the patch in the brief so Muse can review it with shell access disabled.
