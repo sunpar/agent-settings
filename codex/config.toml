@@ -1,6 +1,6 @@
 personality = "pragmatic"
-model = "gpt-6.1-sol"
-model_reasoning_effort = "xhigh"
+model = "gpt-6.2-sol"
+model_reasoning_effort = "high"
 approvals_reviewer = "user"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
