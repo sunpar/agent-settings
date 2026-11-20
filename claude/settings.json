@@ -4,6 +4,8 @@
   "effortLevel": "high",
   "alwaysThinkingEnabled": true,
   "advisorModel": "claude-fable-5-1",
+  "promptCacheTtl": "1h",
+  "subagentPromptCacheTtl": "5m",
   "env": {
     "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
     "DISABLE_BUG_COMMAND": "1",
