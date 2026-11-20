@@ -5,6 +5,9 @@ description: Trigger this if the user says 'council'.
 
 # Council
 
+For UI and UX reviews, follow [council-ui-ux](../council-ui-ux/SKILL.md) for the
+review workflow. Use this skill for reviewer selection and delegation.
+
 Before an audit, address outstanding PR comments, fix known issues, and run
 relevant checks. Give council the updated implementation; do not defer known
 fixes until reviews return. If the user wants to discard the implementation
