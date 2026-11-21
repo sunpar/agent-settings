@@ -11,11 +11,11 @@ Each item gives the rule, when it applies, and how to check it. Check every item
 
 ## Width
 
-- **Fit to content**: use `width: auto` with `max-width: 100%`, and wrap wide tables in a container with `overflow-x: auto`. `width: 100%` spreads the spare width across every column, so a 3-character code column grows to hundreds of pixels and the eye has to cross empty space to read a row.
-- **Filling the container**: when the table has to fill its container (to line up with a card or the page grid), give all the spare width to one column. Use the main text column, or an empty last column with `width: 100%`. Without one column taking the spare width, the browser stretches the others past any cap you set inside them.
-- **Cap free-text columns**: set the cap on an element inside the cell, such as `<td><div style="max-width: 32ch">`. Wrap the text by default. Truncate with an ellipsis only when the full value can still be revealed by mouse, keyboard, and touch (for example, a row that expands on click or focus); a `title` tooltip alone does not work on touch screens. Don't rely on `max-width` on the `td` as a cap: in Chromium, a `width: 100%` table stretched a cell capped at 100 px to 1244 px.
+- **Fit to content**: use `width: auto`, and wrap wide tables in a container with `overflow-x: auto`. `width: 100%` spreads the spare width across every column, so a 3-character code column grows to hundreds of pixels and the eye has to cross empty space to read a row.
+- **Filling the container**: when the table has to fill its container (to line up with a card or the page grid), give all the spare width to one column. Use the main text column, or an empty last column with `width: 100%`. That column squeezes the others down to their longest word, so give short columns `white-space: nowrap` and free-text columns an explicit width. Without one column taking the spare width, the browser stretches the others past any cap you set inside them.
+- **Cap free-text columns**: set the cap on an element inside the cell, such as `<td><div style="max-width: 32ch; overflow-wrap: anywhere">`, so long unbroken values such as URLs also wrap. Wrap the text by default. Truncate with an ellipsis only when the full value can still be revealed by mouse, keyboard, and touch (for example, a row that expands on click or focus); a `title` tooltip alone does not work on touch screens. Don't rely on `max-width` on the `td` as a cap: in Chromium, a `width: 100%` table stretched a cell capped at 100 px to 1244 px.
 - **Grid libraries**: let at most one column flex. Size the others to their content or give them fixed widths.
-- **Check**: render at about 1920 px wide and at the narrowest width you support. At 1920 px, only the column chosen to take spare width (if any) should have a wide empty gap after its content. At the narrowest width, any overflow should scroll inside the table's container instead of squeezing the columns or widening the page.
+- **Check**: render at about 1920 px wide and at the narrowest width you support. At 1920 px, only the column chosen to take spare width (if any) should have a wide empty gap after its content. At the narrowest width, text may wrap, and whatever still doesn't fit should scroll inside the table's container instead of widening the page.
 
 ## Borders and decoration
 
@@ -26,7 +26,7 @@ Each item gives the rule, when it applies, and how to check it. Check every item
 
 ## Row striping
 
-- **When to stripe**: stripe rows when the eye has to follow a row across, as in tables with many columns, wide rows, or many rows. Don't stripe tables with a few rows or a few narrow columns; there the stripes add noise without helping anyone read.
+- **When to stripe**: stripe rows when the eye has trouble following a row from its label to its values, as in tables with many or wide columns. Don't stripe tables whose rows can be read in one glance; there the stripes add noise without helping anyone read.
 - **Stripes replace gridlines**: use stripes instead of row gridlines, never both.
 - **Faint stripes**: make the stripe color barely different from the background, and define it for both light and dark themes.
 - **Hover and selection**: hovered and selected rows must still look different from striped rows.
@@ -39,7 +39,7 @@ Each item gives the rule, when it applies, and how to check it. Check every item
 - **Tabular figures**: use `font-variant-numeric: tabular-nums` so digits line up from row to row.
 - **Consistent precision**: use the same number of decimal places down a column. Choose it for the decision the reader is making, not from whatever precision the source data has.
 - **Units in the header**: put units and scale in the header, as in "Revenue ($M)", instead of repeating them in every cell.
-- **Negative numbers**: show them with a minus sign, or with parentheses in financial tables. Don't rely on red alone. With parentheses, add matching trailing space to positive values so the decimal points still line up.
+- **Negative numbers**: show them with a minus sign, or with parentheses in financial tables. Don't rely on red alone. With parentheses, reserve the width of the closing parenthesis on zero and positive values (for example, a trailing `)` with `visibility: hidden`) so the decimal points still line up; plain trailing spaces collapse in HTML.
 - **Zero versus missing**: keep them apart. Say why a value is missing (for example "n/a" or "pending" in muted text) instead of leaving the cell blank or showing a lone dash.
 - **Check**: scan one numeric column from top to bottom. The decimal points should line up and the precision should never change.
 
