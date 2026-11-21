@@ -1,6 +1,6 @@
 ---
 name: data-views
-description: Use when building, restyling, or reviewing a table, data grid, list view, or data-dense dashboard panel in any stack (HTML/CSS, React, grid libraries such as TanStack Table, AG Grid, or MUI DataGrid). Covers width, borders, row striping, alignment, number formatting, ordering, and emphasis. For charts, use the dataviz skill.
+description: Use when building, restyling, or reviewing a table, data grid, list view, or data-dense dashboard panel in any stack (HTML/CSS, React, grid libraries such as TanStack Table, AG Grid, or MUI DataGrid). Covers width, borders, row striping, alignment, number formatting, ordering, and emphasis. For charts, use the dataviz skill when it is available.
 ---
 
 # Data Views
@@ -13,9 +13,9 @@ Each item gives the rule, when it applies, and how to check it. Check every item
 
 - **Fit to content**: use `width: auto` with `max-width: 100%`, and wrap wide tables in a container with `overflow-x: auto`. `width: 100%` spreads the spare width across every column, so a 3-character code column grows to hundreds of pixels and the eye has to cross empty space to read a row.
 - **Filling the container**: when the table has to fill its container (to line up with a card or the page grid), give all the spare width to one column. Use the main text column, or an empty last column with `width: 100%`. Without one column taking the spare width, the browser stretches the others past any cap you set inside them.
-- **Cap free-text columns**: set the cap on an element inside the cell, such as `<td><div style="max-width: 32ch">`. Let the text wrap, or truncate it with an ellipsis and show the full text in a `title` or tooltip. Don't put `max-width` on the `td`: CSS leaves it undefined for table cells, and Chromium ignores it once the table is `width: 100%` (a cell capped at 100 px rendered 1244 px wide).
+- **Cap free-text columns**: set the cap on an element inside the cell, such as `<td><div style="max-width: 32ch">`. Wrap the text by default. Truncate with an ellipsis only when the full value can still be revealed by mouse, keyboard, and touch (for example, a row that expands on click or focus); a `title` tooltip alone does not work on touch screens. Don't rely on `max-width` on the `td` as a cap: in Chromium, a `width: 100%` table stretched a cell capped at 100 px to 1244 px.
 - **Grid libraries**: let at most one column flex. Size the others to their content or give them fixed widths.
-- **Check**: render at about 1920 px wide and at the narrowest width you support. At 1920 px, no column should have a wide empty gap between its content and the next column. At the narrowest width, the table should scroll inside its container instead of squeezing the columns or widening the page.
+- **Check**: render at about 1920 px wide and at the narrowest width you support. At 1920 px, only the column chosen to take spare width (if any) should have a wide empty gap after its content. At the narrowest width, any overflow should scroll inside the table's container instead of squeezing the columns or widening the page.
 
 ## Borders and decoration
 
@@ -30,7 +30,7 @@ Each item gives the rule, when it applies, and how to check it. Check every item
 - **Stripes replace gridlines**: use stripes instead of row gridlines, never both.
 - **Faint stripes**: make the stripe color barely different from the background, and define it for both light and dark themes.
 - **Hover and selection**: hovered and selected rows must still look different from striped rows.
-- **Stripe by data position**: in virtualized grids and tables with grouped or expandable rows, stripe by the row's position in the data, not with `:nth-child`. Virtualized grids reuse row elements, and expanded child rows shift which rows count as odd or even.
+- **Stripe by data position**: in virtualized grids and tables with grouped or expandable rows, stripe by the row's position in the current sorted and filtered order, not with `:nth-child` or the row's index in the source data. Virtualized grids reuse row elements, and expanded child rows shift which rows count as odd or even; give a detail row its parent's stripe.
 - **Check**: look at the table in both themes with one row hovered and one selected. The stripe should be the faintest of the three.
 
 ## Alignment and numbers
@@ -39,7 +39,7 @@ Each item gives the rule, when it applies, and how to check it. Check every item
 - **Tabular figures**: use `font-variant-numeric: tabular-nums` so digits line up from row to row.
 - **Consistent precision**: use the same number of decimal places down a column. Choose it for the decision the reader is making, not from whatever precision the source data has.
 - **Units in the header**: put units and scale in the header, as in "Revenue ($M)", instead of repeating them in every cell.
-- **Negative numbers**: show them with a minus sign, or with parentheses in financial tables. Don't rely on red alone.
+- **Negative numbers**: show them with a minus sign, or with parentheses in financial tables. Don't rely on red alone. With parentheses, add matching trailing space to positive values so the decimal points still line up.
 - **Zero versus missing**: keep them apart. Say why a value is missing (for example "n/a" or "pending" in muted text) instead of leaving the cell blank or showing a lone dash.
 - **Check**: scan one numeric column from top to bottom. The decimal points should line up and the precision should never change.
 
@@ -47,4 +47,4 @@ Each item gives the rule, when it applies, and how to check it. Check every item
 
 - **Default sort**: sort by what the reader came to find, such as the largest value or the most recent date. Use alphabetical order only when people look rows up by name.
 - **Sparing emphasis**: bold or color only the cells that need attention; when everything is highlighted, nothing stands out.
-- **Sparklines for trends**: show a per-row trend with a sparkline (Tufte's small, word-sized line chart) instead of a run of number columns. Style it with the dataviz skill.
+- **Sparklines for trends**: show a per-row trend with a sparkline (Tufte's small, word-sized line chart) instead of a run of number columns. Style it with the dataviz skill when it is available.
